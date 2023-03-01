@@ -3,6 +3,8 @@
 
 #include <cmath>
 #include <exception>
+#include <typeinfo>
+#include <iostream>
 
 namespace victoriv {
 
@@ -40,7 +42,7 @@ class Matrix {
   auto sumMatrix(const Matrix<T> &other) -> void;
   auto subMatrix(const Matrix<T> &other) -> void;
   auto mulNumber(T num) -> void;
-  auto mulMatrix(const Matrix<T> &other) -> void;
+  auto mulMatrix(const Matrix<T> &other, bool sigmoid = false, bool multithread = false) -> void;
   auto determinant() -> double;
   auto transpose() -> Matrix<T>;
   auto calcComplements() -> Matrix<T>;
@@ -92,11 +94,17 @@ std::ostream& operator << (std::ostream &os, Matrix<T> &mtx) {
   for(int i = 0; i < mtx.getRow(); ++i) {
     for(int j = 0; j < mtx.getColum(); ++j) {
       line += std::to_string(mtx(i, j));
+      line += " ";
     }
-    line += " ";
+    line += "\n";
   }
-  line += "\n";
   return os << line;
+}
+
+template <typename T>
+std::ostream& operator << (std::ostream &os, Matrix<T> &&mtx) {
+  auto temp = mtx;
+  return os << temp;;
 }
 
 template <typename T>
@@ -231,7 +239,7 @@ void Matrix<T>::mulNumber(T num) {
 }
 
 template <typename T>
-void Matrix<T>::mulMatrix(const Matrix<T> &other) {
+void Matrix<T>::mulMatrix(const Matrix<T> &other, bool sigmoid, bool multithread) {
   checkForMult(other);
   Matrix<T> result(m_row, other.m_column);
   for (int i = 0; i < result.m_row; ++i) {
@@ -239,6 +247,13 @@ void Matrix<T>::mulMatrix(const Matrix<T> &other) {
       result.m_matrix[i][j] = 0;
       for (int k = 0; k < m_column; ++k) {
         result.m_matrix[i][j] += m_matrix[i][k] * other.m_matrix[k][j];
+      }
+      if (sigmoid) {
+        if ((typeid(T) == typeid(double)) || (typeid(T) == typeid(float))) {
+          result.m_matrix[i][j] = 1./(1 + exp(-result.m_matrix[i][j]));
+        } else {
+          throw MyException("Incorrect typedef for find sigmoid");
+        }
       }
     }
   }

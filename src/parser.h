@@ -1,3 +1,6 @@
+#ifndef PARSER_PERC_
+#define PARSER_PERC_
+
 #include <fstream>
 #include "my_matrix.h"
 #include <vector>
@@ -6,7 +9,7 @@
 #include <mutex>
 
 using namespace victoriv;
-inline constexpr double NORMA = 255.;
+inline constexpr double kNORMA = 255.;
 
 class Parser {
  public:
@@ -28,15 +31,30 @@ class Parser {
     return result;
   }
 
+  Matrix<double> parse_one_mtrx(std::string in_path) {
+    std::vector<std::string> base;
+    std::ifstream input(in_path);
+    if(!input) throw std::exception();
+    std::string line = "";
+    getline(input, line);
+    Matrix<double> mtrx(1, 768);
+    for(int j = 0; j < 768; ++j) {
+      size_t pos = line.find(",");
+      mtrx(0, j) = std::stoi(line.substr(0, pos)) / kNORMA;
+      line.erase(0, pos + 1);
+    }
+    return mtrx;
+  }
+
  private:
   static void one_th(std::string &line, std::vector<std::pair<int, Matrix<double>>> *result, std::mutex *mtx) {
     size_t pos = line.find(",");
     int value = std::stoi(line.substr(0, pos));
     line.erase(0, pos + 1);
-    auto mtr = Matrix<double>(768, 1);
-    for(int i = 0; i < 768; ++i) {
+    auto mtr = Matrix<double>(1, 768);
+    for(int j = 0; j < 768; ++j) {
       pos = line.find(",");
-      mtr(i, 0) = std::stoi(line.substr(0, pos)) / NORMA;
+      mtr(0, j) = std::stoi(line.substr(0, pos)) / kNORMA;
       line.erase(0, pos + 1);
     }
     {
@@ -68,3 +86,5 @@ class Parser {
 //    return result;
 //  }
 //};
+
+#endif // PARSER_PERC_
