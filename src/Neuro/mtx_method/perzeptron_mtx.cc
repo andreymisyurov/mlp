@@ -1,102 +1,150 @@
 #include "perzeptron_mtx.h"
 
-PerzeptronMtx::PerzeptronMtx(int hidden_layers, int first_layer): weights(new std::vector<NeuronMatrix>()) {
-  if(hidden_layers > 5 || hidden_layers < 1) throw MyException("incorrect input for hidden layers");
-  int count_layers = hidden_layers;
-  int check_layers = first_layer;
+PerzeptronMtx::PerzeptronMtx(int in_hid_layers, int in_first_layer): m_weights(new std::vector<NeuronMatrix>()) {
+  if(in_hid_layers > 5 || in_hid_layers < 1) throw MyException("incorrect input for hidden layer");
+  int count_layers = in_hid_layers;
+  int check_layers = in_first_layer;
   while(--count_layers) check_layers /= 2;
-  if(first_layer > 1024 || check_layers <= 26) throw MyException("incorrect data for first layer");
+  if(in_first_layer > 1024 || check_layers <= 26) throw MyException("incorrect data for first layer");
 
-  weights->emplace_back(std::move(NeuronMatrix(784, first_layer)));
-  feel_random(weights->back());
-  --hidden_layers;
-  while(hidden_layers--) {
-    weights->emplace_back(std::move(NeuronMatrix(first_layer, first_layer / 2)));
-    feel_random(weights->back());
-    first_layer /= 2;
+  m_weights->emplace_back(NeuronMatrix(784, in_first_layer));
+  feel_random(m_weights->back());
+  --in_hid_layers;
+  while(in_hid_layers--) {
+    m_weights->emplace_back(NeuronMatrix(in_first_layer, in_first_layer / 2));
+    feel_random(m_weights->back());
+    in_first_layer /= 2;
   }
-  weights->emplace_back(std::move(NeuronMatrix(first_layer, 26)));
-  feel_random(weights->back());
+  m_weights->emplace_back(NeuronMatrix(in_first_layer, 26));
+  feel_random(m_weights->back());
+}
+
+PerzeptronMtx::PerzeptronMtx(PerzeptronMtx &&other) noexcept {
+  *this = other;
+}
+
+PerzeptronMtx::PerzeptronMtx(const PerzeptronMtx &other) {
+  *this = other;
+}
+
+PerzeptronMtx &PerzeptronMtx::operator=(PerzeptronMtx &&other) noexcept {
+  std::swap(m_weights, other.m_weights);
+  return *this;
+}
+
+PerzeptronMtx &PerzeptronMtx::operator=(const PerzeptronMtx &other) {
+  m_weights = new std::vector<NeuronMatrix>(*other.m_weights);
+  return *this;
 }
 
 PerzeptronMtx::~PerzeptronMtx() {
-  delete weights;
+  delete m_weights;
 }
 
-void PerzeptronMtx::export_data(const std::string &path) {
-  parser->export_data(weights, path);
-}
-
-void PerzeptronMtx::import_data(const std::string &path) {
-  parser->import_data(weights, path);
-}
-
-double min_square(const std::pair<int, NeuronMatrix>& in_data) {
-//  double result = 0;
-//  for(int i = 0; i < in_data.second.getColum(); ++i) {
-//    result += in_data.first - 1 == i ? pow(1 - in_data.second(0, i), 2) : pow(0 - in_data.second(0, i), 2);
-//  }
-//  return result / in_data.second.getColum();
-  double result = 0;
-  for(int i = 0; i < in_data.second.getColum(); ++i) {
-    result += in_data.first - 1 == i ? (1 - in_data.second(0, i)) : in_data.second(0, i);
+void PerzeptronMtx::exportDataBase(const std::string &in_path) {
+  std::ofstream input(in_path, std::ios::binary);
+  if(!input) throw MyException("can't open this file");
+  input << std::to_string(m_weights->size()) << "\n";
+  std::string buffer{};
+  for(auto &&el: *m_weights) {
+    input << std::to_string(el.getRow()) << " " << std::to_string(el.getColum()) << "\n";
+    buffer = "";
+    for(int i = 0; i < el.getRow(); ++i) {
+      for(int j = 0; j < el.getColum(); ++j) {
+        buffer += std::to_string(el(i, j)) + " ";
+      }
+    }
+    *(--buffer.end()) = '\n';
+    input << buffer;
   }
+  input.close();
+}
+
+void PerzeptronMtx::importDataBase(const std::string &in_path) {
+    // проверить на утечки
+    std::fstream input(in_path);
+    if(!input) throw MyException("can't open this file");
+    int loops;
+    input >> loops;
+    auto *temp_weight = new std::vector<NeuronMatrix>;
+    while(loops--) {
+      int m, n;
+      input >> m >> n;
+      NeuronMatrix mtrx(m, n);
+      double buff{};
+      for(int i = 0; i < m; ++i) {
+        for(int j = 0; j < n; ++j) {
+          input >> buff;
+          mtrx(i, j) = buff;
+        }
+      }
+      temp_weight->emplace_back(mtrx);
+    }
+    std::swap(*temp_weight, *m_weights);
+    temp_weight->clear();
+    delete temp_weight;
+    input.close();
+}
+
+double PerzeptronMtx::getMiddleErr(const std::pair<int, NeuronMatrix> &in_data) {
+  double result = 0;
+  for(int i = 0; i < in_data.second.getColum(); ++i)
+    result += in_data.first - 1 == i ? (1 - in_data.second(0, i)) : in_data.second(0, i);
   return result / in_data.second.getColum();
 }
 
-std::pair<int, std::vector<double>> PerzeptronMtx::learn(const std::string &path, int epochs) {
-  if(epochs <= 0 || epochs > 100) throw MyException("incorrect count epoch");
-  auto base = parser->getMatrix(path);
+std::pair<int, std::vector<double>> PerzeptronMtx::learn(const std::string &in_path, int in_epochs) {
+  if(in_epochs <= 0 || in_epochs > 100) throw MyException("incorrect count epoch");
+
+  auto base = Parser::parseDataBase(in_path, 1.0);
   ThreadPool pool(std::thread::hardware_concurrency());
   std::vector<std::future<std::pair<int, NeuronMatrix>>> tasks;
   std::vector<double> result;
-  int counter = epochs;
+  int counter = in_epochs;
   while(counter--) {
 
     for(auto &&el: base)
-      tasks.push_back(pool.enqueue(prediction, el.second, weights, m_step, el.first));
+      tasks.push_back(pool.enqueue(prediction, el.second, m_weights, k_step, el.first));
 
   }
-    for(auto &&el: tasks) result.push_back(min_square(el.get()));
-//    result.push_back(temp);
+  for(auto &&el: tasks) result.push_back(getMiddleErr(el.get()));
 
-  return std::make_pair(epochs, result);
+  return std::make_pair(in_epochs, result);
 }
 
-analytical_data PerzeptronMtx::test(const std::string &path, double part_of_tests) {
+analytical_data PerzeptronMtx::test(const std::string &in_path, double in_data_part) {
+  // проверить корректность вычисления аналитики
   analytical_data result;
   Timer timer(true);
   ThreadPool pool(std::thread::hardware_concurrency());
   std::vector<std::future<void>> tasks;
-  auto base = parser->getMatrix(path, part_of_tests);
+  auto base = Parser::parseDataBase(in_path, in_data_part);
   int pass = (int)base.size();
   std::vector<int> analytic{0, 0, 0, 0};
   std::mutex mute;
   for(auto &&el: base)
-    tasks.push_back(pool.enqueue(check_case, &pass, el.first, el.second, weights, m_step, &analytic, &mute));
+    tasks.push_back(pool.enqueue(analyzeCase, &pass, el.first, el.second, m_weights, k_step, &analytic, &mute));
   for(auto &&el: tasks) el.get();
-  timer.Stop();
+  timer.stop();
   std::cout << analytic[0] << " " << analytic[1] << " " << analytic[2] << " " << analytic[3] << std::endl;
-  // убедиться что формулы верны, а они гавеные
   result.precision = double(analytic[0]) / (analytic[0] + analytic[2]);
   result.recall = double(analytic[0]) / (analytic[0] + analytic[1]);
-  result.f_measure = (1 + 1*1) * result.precision * result.recall / (1*1*result.precision + result.recall);
-//  result.average_accuracy = static_cast<double>(pass) / base.size();
-  result.average_accuracy = (double)(analytic[0] + analytic[3]) / (analytic[0] + analytic[3] + analytic[1] + analytic[2]);
-//  std::cout << result.precision << " " << result.recall << " " << result.f_measure << " " << result.average_accuracy << std::endl;
+  result.f_measure = (1 + 1 * 1) * result.precision * result.recall / (1 * 1 * result.precision + result.recall);
+  result.average_accuracy =
+      (double)(analytic[0] + analytic[3]) / (analytic[0] + analytic[3] + analytic[1] + analytic[2]);
   result.time = timer.getTime();
   return result;
 }
 
-int PerzeptronMtx::predict(const NeuronMatrix &layer_main) {
-  return prediction(layer_main, weights, m_step).first;
+int PerzeptronMtx::predict(const NeuronMatrix &in_layer) {
+  return prediction(in_layer, m_weights, k_step).first;
 }
 
-std::pair<int, NeuronMatrix> PerzeptronMtx::prediction(const NeuronMatrix &layer_main, std::vector<NeuronMatrix> *weights, double in_step, std::optional<int> correct) {
+std::pair<int, NeuronMatrix> PerzeptronMtx::prediction(const NeuronMatrix &in_layer, std::vector<NeuronMatrix> *inout_weights, double in_step, std::optional<int> in_correct) {
   // техдолг - убрать подсчет ошибков на нулевом слое
   // убрать std::move и протестировать
-  std::vector<NeuronMatrix> layers{layer_main};
-  for(auto &el: *weights) {
+  std::vector<NeuronMatrix> layers{in_layer};
+  for(auto &el: *inout_weights) {
     layers.emplace_back(std::move(layers.back().mulMatrix(el, true, false)));
   }
 
@@ -109,33 +157,32 @@ std::pair<int, NeuronMatrix> PerzeptronMtx::prediction(const NeuronMatrix &layer
     }
   }
 
-
-  if(correct) {
-    std::vector<NeuronMatrix> sum_err_weight_prev(*weights);
+  if(in_correct) {
+    std::vector<NeuronMatrix> sum_err_weight_prev(*inout_weights);
     std::vector<NeuronMatrix> errors;
-    std::vector<NeuronMatrix> d_weight = *weights;
+    std::vector<NeuronMatrix> d_weight = *inout_weights;
     for(auto &&el: layers)
       errors.emplace_back(std::move(*(el.transport())));
 
     for(int i = 0; i < 26; ++i) {
       double o_i = layers.back()(0, i);
-      double err_i = -o_i * (1 - o_i) * ((i + 1 == correct.value() ? 1. : 0.) - o_i);
+      double err_i = -o_i * (1 - o_i) * ((i + 1 == in_correct.value() ? 1. : 0.) - o_i);
       errors.back()(i, 0) = err_i;
     }
 
-    sum_err_weight_prev.back() = weights->back() * errors.back();
+    sum_err_weight_prev.back() = inout_weights->back() * errors.back();
 
-    for(int i = errors.size() - 2; i > 0; --i) {
+    for(size_t i = errors.size() - 2; i > 0; --i) {
       for(int j = 0; j < errors[i].getRow(); ++j) {
         double o_j = errors[i](j, 0);
         errors[i](j, 0) = o_j * (1 - o_j) * sum_err_weight_prev[i](j, 0);
       }
-      sum_err_weight_prev[i - 1] = (*weights)[i - 1] * errors[i];
+      sum_err_weight_prev[i - 1] = (*inout_weights)[i - 1] * errors[i];
     }
 
 
     int l = 0;
-    for(auto &el: d_weight) {
+    for(auto &&el: d_weight) {
       for(int i = 0; i < el.getRow(); ++i) {
         for(int j = 0; j < el.getColum(); ++j) {
           el(i, j) = layers[l](0, i) * errors[l + 1](j, 0) * in_step;
@@ -144,7 +191,7 @@ std::pair<int, NeuronMatrix> PerzeptronMtx::prediction(const NeuronMatrix &layer
       ++l;
     }
     auto minus = d_weight.begin();
-    for(auto &&el: *weights) {
+    for(auto &&el: *inout_weights) {
       el -= *minus;
       ++minus;
     }
@@ -152,39 +199,26 @@ std::pair<int, NeuronMatrix> PerzeptronMtx::prediction(const NeuronMatrix &layer
   return std::make_pair(num + 1, layers.back());
 }
 
-void PerzeptronMtx::check_case(int *pass, int correct, NeuronMatrix mtrx, std::vector<NeuronMatrix> *weights, double in_step, std::vector<int> *analytic, std::mutex *mute) {
-  // [0] - True Positive когда заряд больше 0,85 у правильного нейрона
-  // [1] - False Negative когда заряд больше 0,85 у НЕ правильного нейрона
-  // [2] - False Positive когда заряд меньше 0,85 у НЕ правильного нейрона
-  // [3] - True Negative когда заряд меньше 0,85 у правильного нейрона
-  auto control = prediction(mtrx, weights, in_step);
-  std::lock_guard<std::mutex> guard(*mute);
+void PerzeptronMtx::analyzeCase(int *inout_count, int in_correct, const NeuronMatrix &in_mtrx, const std::vector<NeuronMatrix> *in_weights, double in_step, std::vector<int> *inout_analytic, std::mutex *in_mutex) {
+  // проверить метрики
+  auto control = prediction(in_mtrx, const_cast<std::vector<NeuronMatrix> *>(in_weights), in_step);
+  std::lock_guard<std::mutex> guard(*in_mutex);
   for(int i = 0; i < control.second.getRow(); ++i) {
-    // оптимизировать это говно
-    if(control.second(0, i) > 0.85) {
-      if(control.first == correct) {
-        ++(*analytic)[0];
-      } else {
-        ++(*analytic)[1];
-      }
+    // оптимизировать
+    if(control.second(0, i) >= 0.85) {
+      control.first == in_correct ? ++(*inout_analytic)[0] : ++(*inout_analytic)[1];
     } else {
-      if(control.second(0, i) < 0.85) {
-        if(control.first != correct) {
-          ++(*analytic)[2];
-        } else {
-          ++(*analytic)[3];
-        }
-      }
+      control.first != in_correct ? ++(*inout_analytic)[2] : ++(*inout_analytic)[3];
     }
   }
-  if(correct != control.first) {
-    *pass -= 1;
+  if(in_correct != control.first) {
+    *inout_count -= 1;
   }
 }
 
-void PerzeptronMtx::feel_random(NeuronMatrix &mtrx) {
-  srand(time(0));
-  for(int i = 0; i < mtrx.getRow(); ++i)
-    for(int j = 0; j < mtrx.getColum(); ++j)
-      mtrx(i, j) = (rand() % 256) / 255. - 0.5;
+void PerzeptronMtx::feel_random(NeuronMatrix &inout_mtrx) {
+  srand(time(nullptr));
+  for(int i = 0; i < inout_mtrx.getRow(); ++i)
+    for(int j = 0; j < inout_mtrx.getColum(); ++j)
+      inout_mtrx(i, j) = (rand() % 256) / 255. - 0.5;
 }

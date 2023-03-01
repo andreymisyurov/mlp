@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>best_weights.bin</file>
-        <file>krit.wav</file>
+        <file alias="best_weight">resources/best_weights.bin</file>
+        <file alias="crit_sound">resources/crit_sound.wav</file>
+        <file alias="icon">resources/icon.icns</file>
     </qresource>
 </RCC>

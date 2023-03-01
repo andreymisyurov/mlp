@@ -15,17 +15,17 @@ TEST(perzeptron_mtx, ex_1) {
    temp.learn(k_one_matrix, 2);
    temp.test(k_one_matrix, 0.2);
    temp.predict(mtrx);
-   temp.export_data(k_export);
-   temp.import_data(k_export);
+  temp.exportDataBase(k_export);
+  temp.importDataBase(k_export);
    system(("rm " + k_export).c_str());
 }
 
 TEST(parser, ex_1) {
   std::vector<NeuronMatrix> weight;
-  std::vector<std::pair<int, NeuronMatrix>> temp = Parser::getMatrix(k_one_matrix);
+  std::vector<std::pair<int, NeuronMatrix>> temp = Parser::parseDataBase(k_one_matrix, 1.0);
   weight.push_back(temp[0].second);
-  Parser::export_data(&weight, k_export);
-  Parser::import_data(&weight, k_export);
+  Parser::export_data(k_export, &weight);
+  Parser::import_data(k_export, &weight);
   GTEST_ASSERT_EQ(temp[0].second == weight[0], 1);
   system(("rm " + k_export).c_str());
 }

@@ -1,6 +1,6 @@
-#pragma once
-// убрать прагму
-// вынести реализацию в source файл
+#ifndef SRC_PARSER_PARSER_H_
+#define SRC_PARSER_PARSER_H_
+
 #include <fstream>
 #include <vector>
 #include <iostream>
@@ -9,137 +9,56 @@
 #include "neuron_matrix.h"
 #include "thread_pool.h"
 
-//using namespace victoriv;
+// константа для нормализации значений матрицы
 inline constexpr double kNORMA = 255.;
 
 class Parser {
-  // приватный деструктор чтобы нельзя было создать объект в классе только со стат функциями
-  ~Parser() = default;
+  /** Клас Parser реализован с использованием многопоточности.\n
+   * Методы данного класса статические, могут парсить данные из файла для входного слоя нейронной сети, также импортировать
+   * и экспортировать матрицы весов
+   */
  public:
-  static std::vector<std::pair<int, NeuronMatrix>> getMatrix(const std::string &path, double in_part = 1.0) {
-    // переименовать
-    // бросить крафтовое исключение
-    std::vector<std::string> base;
-    std::ifstream input(path, std::ios::binary);
-    if(!input) throw MyException("can't open this file");
-    std::string line{};
-    while(getline(input, line)) base.push_back(line);
+  /** СТАТИЧЕСКИЙ МЕТОД parseDataBase. Парсит базу данных из файла.\n
+   * Первое значение - это ожидаемый правильный ответ, далее через запятую и пробел 784(матрица 28х28)\n
+   * значения от 0 до 256, что соответствует градации серых оттенков.\n
+   * @param in_path абсолютный путь к файлу базы данных
+   * @param in_data_part Принимает значение от 0.0 до 1.0. Этот аргумент указывает функции
+   * какую часть выборки необходимо спарсить, Где 0 - это пустая выборка, 1 - вся база целиком
+   * @return возвращает упорядоченный данные - вектор из пары,\n
+   * где first - ожидаемое значение,\n
+   * а second - матрица входного слоя прошедшая нормализацию(с вещественными значениями от 0 до 1)
+   */
+  static auto parseDataBase(const std::string &in_path, double in_data_part) -> std::vector<std::pair<int, NeuronMatrix>>;
 
-    int count_case = static_cast<int>((double)base.size() * in_part);
+  /** СТАТИЧЕСКИЙ МЕТОД exportDataBase. Выгружает данные из матрицы весов по определенному пути на локальный диск.\n
+   * Если файла не существует - создаст. Если существует - перезапишет.
+   *
+   * @param in_path абсолютный путь для сохранения данных.
+   * @param in_weight вектор матриц со значениями весов.
+   */
+  static auto export_data(const std::string &in_path, const std::vector<NeuronMatrix> *in_weight) -> void;
 
-    std::vector<std::pair<int, NeuronMatrix>> result;
-    ThreadPool pool(std::thread::hardware_concurrency());
-    std::vector<std::future<void>> tasks;
-
-    std::mutex mtx;
-    for(auto &&i: base) {
-      if(!count_case--) break;
-      tasks.push_back(pool.enqueue(one_th, i, &result, &mtx));
-    }
-
-    for(auto &&el: tasks) el.get();
-    return result;
-  }
-
-  static NeuronMatrix parse_one_mtrx(const std::string& in_path) {
-    // временная функция чисто для тестов
-    std::ifstream input(in_path);
-    if(!input) throw MyException("can't open this file");
-
-    std::string line{};
-    getline(input, line);
-
-    size_t pos = line.find(',');
-    int value = std::stoi(line.substr(0, pos));
-    line.erase(0, pos + 1);
-
-    NeuronMatrix mtrx(1, 784);
-    for(int j = 0; j < mtrx.getColum() - 1; ++j) {
-      size_t pos = line.find(',');
-      mtrx(0, j) = std::stoi(line.substr(0, pos)) / kNORMA;
-      line.erase(0, pos + 1);
-    }
-    mtrx(0, 783) = std::stoi(line);
-    return mtrx;
-  }
-
-  static void export_data(std::vector<NeuronMatrix> *weight, const std::string& in_path) {
-    std::ofstream input(in_path, std::ios::binary);
-    if(!input) throw MyException("can't open this file");
-    input << std::to_string(weight->size()) << "\n";
-    std::string buffer{};
-    for(auto &&el: *weight) {
-      input << std::to_string(el.getRow()) << " " << std::to_string(el.getColum()) << "\n";
-      buffer = "";
-      for(int i = 0; i < el.getRow(); ++i) {
-        for(int j = 0; j < el.getColum(); ++j) {
-          buffer += std::to_string(el(i, j)) + " ";
-        }
-      }
-      *(--buffer.end()) = '\n';
-      input << buffer;
-    }
-    input.close();
-//    std::fstream input(in_path, std::ios::out);
-//    input << std::to_string(weight->size()) << "\n";
-//    std::string buffer{};
-//    for(auto &&el: *weight) {
-//      input << std::to_string(el.getRow()) << " " << std::to_string(el.getColum()) << "\n";
-//      buffer = "";
-//      for(int i = 0; i < el.getRow(); ++i) {
-//        for(int j = 0; j < el.getColum(); ++j) {
-//          buffer += std::to_string(el(i, j)) + " ";
-//        }
-//      }
-//      *(--buffer.end()) = '\n';
-//      input << buffer;
-//    }
-//    input.close();
-  }
-
-  static void import_data(std::vector<NeuronMatrix> *weight, const std::string& in_path) {
-    // проверить на утечки
-    std::fstream input(in_path);
-    if(!input) throw MyException("can't open this file");
-    int loops;
-    input >> loops;
-    std::vector<NeuronMatrix> *out_weight = new std::vector<NeuronMatrix>;
-    while(loops--) {
-      int m, n;
-      input >> m >> n;
-      NeuronMatrix mtrx(m, n);
-      double buff;
-      for(int i = 0; i < m; ++i) {
-        for(int j = 0; j < n; ++j) {
-          input >> buff;
-          mtrx(i, j) = buff;
-        }
-      }
-      out_weight->emplace_back(mtrx);
-    }
-
-    std::swap(*out_weight, *weight);
-    out_weight->clear();
-    delete out_weight;
-    input.close();
-  }
+  /** СТАТИЧЕСКИЙ МЕТОД exportDataBase. Загружает данные из файла на жестком диске в матрицу весов.
+   *
+   * @param in_path абсолютный путь к файлу с базой данных
+   * @param inout_weight результирующий аргумент, указатель на матрицу весов
+   */
+  static auto import_data(const std::string &in_path, std::vector<NeuronMatrix> *inout_weight) -> void;
+  // функция исключительно для тестов, утилизировать
+  static NeuronMatrix parse_one_mtrx(const std::string &in_path);
 
  private:
-  static void one_th(std::string &line, std::vector<std::pair<int, NeuronMatrix>> *result, std::mutex *mtx) {
-    size_t pos = line.find(',');
-    int value = std::stoi(line.substr(0, pos));
-    line.erase(0, pos + 1);
-    auto mtr = NeuronMatrix(1, 784);
-    for(int j = 0; j < mtr.getColum() - 1; ++j) {
-      pos = line.find(',');
-      mtr(0, j) = std::stoi(line.substr(0, pos)) / kNORMA;
-      line.erase(0, pos + 1);
-    }
-    mtr(0, 783) = std::stoi(line);
-    {
-      std::lock_guard<std::mutex> guard(*mtx);
-      result->push_back(std::make_pair(value, mtr));
-    }
-  };
+  /** СТАТИЧЕСКИЙ МЕТОД parseOneLine. Приватная функция для реализации многопоточности.
+   * Парсит только входящую строку. Обратите внимание что строка заходит по не константной ссылке и это не ошибка.
+   * Функция перетирает входящую строчку.
+   *
+   * @param in_line входящая строка для парсинга. Заходит по не константной ссылке ссылке, обрезается внутри функции.
+   * @param inout_result результирующий аргумент. Указатель на вектор
+   * состоящий из пар(правильный ответ, матрица). Для работы с ним используется мьютекс
+   * @param in_mtx указатель на мьютекс для работы с общедоступным указателем на вектор в потоках
+   */
+  static auto parseOneLine(std::string &in_line, std::vector<std::pair<int, NeuronMatrix>> *inout_result, std::mutex *in_mtx) -> void;
+  ~Parser();
 };
 
+#endif //SRC_PARSER_PARSER_H_

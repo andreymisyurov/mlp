@@ -10,10 +10,10 @@ Controller::Controller(QWidget *parent): QWidget(parent),
 
   // копируем темп файл из ресурсов
   QString temp_file = QCoreApplication::applicationDirPath() + "/temp.bin";
-  QFile::copy(":/best_weights.bin", temp_file);
+  QFile::copy(":/best_weight", temp_file);
   auto p = QFile(temp_file).permissions();
   QFile::setPermissions(temp_file, p | QFileDevice::ReadOwner | QFileDevice::WriteOwner);
-  m_neuro_mode->import_data(temp_file.toStdString());
+  m_neuro_mode->importDataBase(temp_file.toStdString());
   QFile(temp_file).remove();
 
   // устанавливаем валидацию на ввод и начальный цвет сцены
@@ -79,13 +79,13 @@ void Controller::checkGoButtons() {
     m_ui->s_test_proc->setEnabled(true);
   }
 
-//  if(m_ui->l_path_learn->text().isEmpty()) {
-//    m_ui->b_do_learn->setEnabled(false);
-//    m_ui->le_learn_epoch->setEnabled(false);
-//  } else {
-//    m_ui->b_do_learn->setEnabled(true);
-//    m_ui->le_learn_epoch->setEnabled(true);
-//  }
+  if(m_ui->l_path_learn->text().isEmpty()) {
+    m_ui->b_do_learn->setEnabled(false);
+    m_ui->le_learn_epoch->setEnabled(false);
+  } else {
+    m_ui->b_do_learn->setEnabled(true);
+    m_ui->le_learn_epoch->setEnabled(true);
+  }
 }
 
 void Controller::openLearnFile() {
@@ -114,8 +114,8 @@ void Controller::createAI() {
   // добавить графовый метод в класс Assistant
   // возможно вынести QMessageBox в класс assistant
   try {
-    Perceptron *temp =
-        Assistant::getInstance().createPerceptron((m_ui->cb_count_hidden_layers->currentText()).toInt(), (m_ui->le_neurons_first_layer->text()).toInt(), m_ui->rb_matrix_mode->isChecked());
+      Perceptron *temp =
+          Assistant::getInstance().createPerceptron((m_ui->cb_count_hidden_layers->currentText()).toInt(), (m_ui->le_neurons_first_layer->text()).toInt(), m_ui->rb_matrix_mode->isChecked());
     std::swap(temp, m_neuro_mode);
     delete temp;
   } catch(MyException &ex) {
@@ -163,7 +163,7 @@ void Controller::do_test() {
 void Controller::do_import() {
   // возможно доработать обработку эксепшена
   try {
-    m_neuro_mode->import_data(m_ui->l_path_import->text().toStdString());
+    m_neuro_mode->importDataBase(m_ui->l_path_import->text().toStdString());
     QMessageBox(QMessageBox::Icon::Information, "Import", "imported successfully", QMessageBox::StandardButton::Apply, this).exec();
   } catch(MyException &ex) {
     Assistant::getInstance().playSound(k_ERROR_SOUND);
@@ -176,7 +176,7 @@ void Controller::do_import() {
 void Controller::do_export() {
   // возможно доработать обработку эксепшена
   try {
-    m_neuro_mode->export_data(m_ui->l_path_export->text().toStdString());
+    m_neuro_mode->exportDataBase(m_ui->l_path_export->text().toStdString());
     QMessageBox(QMessageBox::Icon::Information, "Import", "exported successfully", QMessageBox::StandardButton::Apply, this).exec();
   } catch(MyException &ex) {
     Assistant::getInstance().playSound(k_ERROR_SOUND);

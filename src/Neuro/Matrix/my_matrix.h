@@ -1,13 +1,10 @@
-#pragma once
-// прагма
+#ifndef SRC_MATRIX_MY_MATRIX_H_
+#define SRC_MATRIX_MY_MATRIX_H_
 // функция транспонс
-// неймспейс
 
 #include <cmath>
 #include <exception>
 #include <string>
-
-//namespace victoriv {
 
 inline constexpr auto EPS = 1e-6;
 
@@ -466,6 +463,4 @@ void Matrix<T>::checkConstructor(int value_row, int value_column) {
     throw MyException("Bad value for row or colum.");
 }
 
-
-
-//}  // namespace victoriv
+#endif // SRC_MATRIX_MY_MATRIX_H_

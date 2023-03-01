@@ -13,7 +13,7 @@
 #include "perzeptron_mtx.h"
 #include "learnanswer.h"
 #include "parser.h"
-
+#include "perzeptron_grph.h"
 
 class Assistant {
 public:

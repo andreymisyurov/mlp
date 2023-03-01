@@ -1,3 +1,6 @@
+#ifndef SRC_MTX_METHOD_PERZEPTRON_MTX_H_
+#define SRC_MTX_METHOD_PERZEPTRON_MTX_H_
+
 #include <optional>
 #include <vector>
 
@@ -5,107 +8,76 @@
 #include "perceptron_abstract.h"
 #include "timer.h"
 
+// порешать вопросик с транспонированием матрицы!
+
 class PerzeptronMtx: public Perceptron {
+  /** КЛАСС PerceptronMtx
+   * Реализует структуру нейронной сети, в которой веса хранятся в матрицах весов.
+   * Наследован от абстрактного класса Perceptron
+   */
  public:
-  // допилить правило пяти
-  explicit PerzeptronMtx(int hidden_layers = 2, int first_layer = 256);
+  explicit PerzeptronMtx(int in_hid_layers = 2, int in_first_layer = 256);
+  PerzeptronMtx(const PerzeptronMtx &other);
+  PerzeptronMtx(PerzeptronMtx &&other) noexcept;
+  PerzeptronMtx &operator=(PerzeptronMtx &&other) noexcept;
+  PerzeptronMtx &operator=(const PerzeptronMtx &other);
   ~PerzeptronMtx() override;
 
-  void export_data(const std::string &path) override;
-  void import_data(const std::string &path) override;
-  std::pair<int, std::vector<double>> learn(const std::string &path, int epochs = 1) override;
-  analytical_data test(const std::string &path, double part_of_tests = 1.0) override;
-  int predict(const NeuronMatrix &layer_main) override;
+ public:
+  auto learn(const std::string &in_path, int in_epochs)       -> std::pair<int, std::vector<double>> override;
+  auto test(const std::string &in_path, double in_data_part)  -> analytical_data override;
+  auto predict(const NeuronMatrix &in_layer)                -> int override;
+  auto exportDataBase(const std::string &in_path)                -> void override;
+  auto importDataBase(const std::string &in_path)                -> void override;
+
+// private:
+ public:
+/** СТАТИЕСКИЙ МЕТОД prediction. Является основным методом класса, задействован в методах learn, test, predict.
+ * Реализован с использованием многопоточности.
+ *
+ * @param in_layer матрица значений входного слоя вида 1x784
+ * @param inout_weights указатель матрицу значений весов
+ * @param in_step шаг обучения
+ * @param in_correct ожидаемый ответ, значение int от 0 до 25 включительно
+ * @return возвращает пару, где first - это значение от 1 до 26 включительно.\n
+ * Предсказание сети(номер нейрона выходного слоя с наибольшим зарядом),\n
+ * а second - матрица всех зарядов нейронов выходного слоя(необходимо для аналитики)
+ */
+  auto static prediction(const NeuronMatrix &in_layer,
+                          std::vector<NeuronMatrix> *inout_weights, double in_step,
+                          std::optional<int> in_correct = std::nullopt)             -> std::pair<int, NeuronMatrix>;
+  /** СТАТИЕСКИЙ МЕТОД analyzeCase - анализирует поведение нейронной сети, собирает аналитику.
+   *
+   * @param inout_count результирующи аргумент, изначально равен количеству тест-кейсов. Изменяется в потоках
+   * @param in_correct ожидаемый ответ сети
+   * @param in_mtrx матрица 26ти зарядов нейронов выходного слоя
+   * @param in_weights указатель на матрицу весов
+   * @param in_step шаг обучения
+   * @param inout_analytic вектор с аналитическими данными, который в потоках накапливает следующие значения:\n
+   * *[0] - True Positive когда заряд больше 0,85 у правильного нейрона\n
+   * *[1] - False Negative когда заряд больше 0,85 у НЕ правильного нейрона\n
+   * *[2] - False Positive когда заряд меньше 0,85 у НЕ правильного нейрона\n
+   * *[3] - True Negative когда заряд меньше 0,85 у правильного нейрона
+   * @param in_mutex мьютекс для контроля доступа к аргументам inout_pass и inout_analytics
+   */
+  auto static analyzeCase(int *inout_count, int in_correct, const NeuronMatrix& in_mtrx,
+                          const std::vector<NeuronMatrix> *in_weights, double in_step,
+                          std::vector<int> *inout_analytic, std::mutex *in_mutex)   -> void;
+  /** СТАТИЕСКИЙ МЕТОД feel_random заполняет матрицу случайными значениями от -0.5 до 0.5
+   *
+   * @param inout_mtrx результирующий аргумент, матрица которую нужно заполнить случайными значениями
+   */
+  static auto feel_random(NeuronMatrix &inout_mtrx)                                        -> void;
+  /** СТАТИЕСКИЙ МЕТОД getMiddleErr высчитывает и усредняет ошибку на выходном слое
+   *
+   * @param in_data матрица выходного слоя состоящая из 26 значений зарядов нейронов
+   * @return возвращает значение средней ошибки конкретного одного предсказания
+   */
+  auto static getMiddleErr(const std::pair<int, NeuronMatrix> &in_data)             -> double;
 
  private:
-  static std::pair<int, NeuronMatrix> prediction(const NeuronMatrix &layer_main, std::vector<NeuronMatrix> *weights, double in_step, std::optional<int> correct = std::nullopt);
-  static void check_case(int *pass, int correct, NeuronMatrix mtrx, std::vector<NeuronMatrix> *weights, double in_step, std::vector<int> *analytic, std::mutex *mute);
-  void feel_random(NeuronMatrix &mtrx);
-
-  std::vector<NeuronMatrix> *weights;
-  double m_step = 0.15;
-  Parser *parser = nullptr;
-
-// single thread realization
-//  void learn(const std::string &path, int8_t epochs = 1) {
-//    Parser temp;
-//    auto base = temp.getMatrix(path);
-//    while(epochs) {
-//      for (auto &&el:base)
-//        prediction(el.second, el.first);
-//      --epochs;
-//    }
-//  }
-
-//  int prediction(const NeuronMatrix &layer_main, std::optional<int> correct = std::nullopt) {
-//    std::vector<NeuronMatrix> layers;
-//    layers.push_back(layer_main);
-//    for(auto &el: *weights) layers.push_back(layers.back().mulMatrix(el, false));
-//
-//    double maximum = layers.back()(0, 0);
-//    int num = 0;
-//    for(int i = 0; i < layers.back().getColum(); ++i) {
-//      if(layers.back()(0, i) > maximum) {
-//        maximum = layers.back()(0, i);
-//        num = i;
-//      }
-//    }
-//
-//    if(correct) {
-//      std::vector<NeuronMatrix> sum_err_weight_prev(*weights);
-//      std::vector<NeuronMatrix> errors;
-//      for(auto &&el: layers) errors.push_back(el.transpose());
-//
-//      for(int i = 0; i < layers.back().getColum(); ++i) {
-//        double o_i = layers.back()(0, i);
-//        double err_i = -o_i * (1 - o_i) * ((i + 1 == correct.value() ? 1. : 0.) - o_i);
-//        errors.back()(i, 0) = err_i;
-//      }
-//
-//      sum_err_weight_prev.back() = weights->back() * errors.back();
-//      for(int i = errors.size() - 2; i > 0; --i) {
-//        for(int j = 0; j < errors[i].getRow(); ++j) {
-//          double o_j = errors[i](j, 0);
-//          errors[i](j, 0) = o_j * (1 - o_j) * sum_err_weight_prev[i](j, 0);
-//        }
-//        sum_err_weight_prev[i - 1] = (*weights)[i - 1] * errors[i];
-//      }
-//      std::vector<NeuronMatrix> d_weight = *weights;
-//
-//      int l = 0;
-//      for(auto &el: d_weight) {
-//        for(int i = 0; i < el.getRow(); ++i)
-//          for(int j = 0; j < el.getColum(); ++j) {
-//            el(i, j) = layers[l](0, i) * errors[l + 1](j, 0) * 0.1;
-//          }
-//        ++l;
-//      }
-//
-//      auto minus = d_weight.begin();
-//      for(auto &el: *weights) {
-//        el -= *minus;
-//        ++minus;
-//      }
-//    }
-//    return num + 1;
-//  }
-
-//  double test(const std::string &path) {
-//    Parser temp;
-//    auto base = temp.getMatrix(path);
-//    int pass = 0;
-//    for(auto el: base)
-//      pass += check_case(el.first, el.second);
-//    return static_cast<double>(pass) / base.size();
-//  }
-
-//  int check_case(int correct, NeuronMatrix mtrx) {
-//    auto control = prediction(mtrx);
-//    if(correct != control) {
-//      return 0;
-//    }
-//    return 1;
-//  }
-//
-
+  std::vector<NeuronMatrix> *m_weights = nullptr;
+  const double k_step = 0.15;
 };
+
+#endif // SRC_MTX_METHOD_PERZEPTRON_MTX_H_

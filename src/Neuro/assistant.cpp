@@ -73,6 +73,11 @@ QString Assistant::openSaveFile() {
 
 Perceptron* Assistant::createPerceptron(int in_layers, int in_first_layer, bool in_mode) {
     // в правую сторону тернарника вставить перцептрон графовым методом
-    Perceptron *result = in_mode ? new PerzeptronMtx(in_layers, in_first_layer) : new PerzeptronMtx(in_layers, in_first_layer);
+    Perceptron *result = nullptr;
+    if(in_mode) {
+      result = new PerzeptronMtx(in_layers, in_first_layer);
+    } else {
+      result = new PerzeptronGrph(in_layers, in_first_layer);
+    }
     return result;
 }

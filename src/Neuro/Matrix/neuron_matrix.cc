@@ -72,18 +72,8 @@ NeuronMatrix NeuronMatrix::mulMatrix(const NeuronMatrix &other, bool swap) {
   return result;
 }
 
-//NeuronMatrix NeuronMatrix::transpose() {
-//  return static_cast<NeuronMatrix>(transpose());
-//}
-
-NeuronMatrix NeuronMatrix::transpose() {
-  NeuronMatrix result(m_column, m_row);
-  for(int i = 0; i < result.m_row; ++i) {
-    for(int j = 0; j < result.m_column; ++j) {
-      result.m_matrix[i][j] = m_matrix[j][i];
-    }
-  }
-  return result;
+std::shared_ptr<NeuronMatrix> NeuronMatrix::transport() {
+  return std::static_pointer_cast<NeuronMatrix>(Matrix<double>::trans());
 }
 
 //auto NeuronMatrix::transpo() -> Matrix<double> * {
