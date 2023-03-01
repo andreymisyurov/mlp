@@ -1,22 +1,22 @@
 #include "perzeptron_mtx.h"
 
-PerzeptronMtx::PerzeptronMtx(int hidden_layers): weights(new std::vector<NeuronMatrix>()) {
-  int start_rows = 256;
+PerzeptronMtx::PerzeptronMtx(int hidden_layers, int first_layer): weights(new std::vector<NeuronMatrix>()) {
   if(hidden_layers > 5 || hidden_layers < 1) throw MyException("incorrect input for hidden layers");
-  if(start_rows > 1024 || (start_rows / hidden_layers) <= 26) throw MyException("incorrect data for first layer");
-  weights->emplace_back(std::move(NeuronMatrix(784, start_rows)));
+  int count_layers = hidden_layers;
+  int check_layers = first_layer;
+  while(--count_layers) check_layers /= 2;
+  if(first_layer > 1024 || check_layers <= 26) throw MyException("incorrect data for first layer");
+
+  weights->emplace_back(std::move(NeuronMatrix(784, first_layer)));
   feel_random(weights->back());
   --hidden_layers;
   while(hidden_layers--) {
-    weights->emplace_back(std::move(NeuronMatrix(start_rows, start_rows / 2)));
+    weights->emplace_back(std::move(NeuronMatrix(first_layer, first_layer / 2)));
     feel_random(weights->back());
-    start_rows /= 2;
+    first_layer /= 2;
   }
-  weights->emplace_back(std::move(NeuronMatrix(start_rows, 26)));
+  weights->emplace_back(std::move(NeuronMatrix(first_layer, 26)));
   feel_random(weights->back());
-  for(auto el: *weights) {
-//    std:: cout << el.getRow() << " " << el.getColum() << std::endl;
-  }
 }
 
 PerzeptronMtx::~PerzeptronMtx() {

@@ -15,7 +15,7 @@ void PaintScene::mousePressEvent(QGraphicsSceneMouseEvent *event) {
                      40,
                      40,
                      QPen(Qt::NoPen),
-                     QBrush(Qt::white));
+                     QBrush(Qt::black));
     m_prev_point = event->scenePos();
 }
 
@@ -24,6 +24,6 @@ void PaintScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
             m_prev_point.y(),
             event->scenePos().x(),
             event->scenePos().y(),
-            QPen(Qt::white, 40, Qt::SolidLine, Qt::RoundCap));
+            QPen(Qt::black, 40, Qt::SolidLine, Qt::RoundCap));
     m_prev_point = event->scenePos();
 }

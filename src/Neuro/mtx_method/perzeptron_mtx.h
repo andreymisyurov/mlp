@@ -7,7 +7,7 @@
 class PerzeptronMtx: public Perceptron {
  public:
   // допилить правило пяти
-  explicit PerzeptronMtx(int hidden_layers = 2);
+  explicit PerzeptronMtx(int hidden_layers = 2, int first_layer = 256);
   ~PerzeptronMtx() override;
 
   void export_data(const std::string &path) override;

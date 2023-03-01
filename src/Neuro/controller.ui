@@ -22,6 +22,9 @@
      <height>31</height>
     </rect>
    </property>
+   <property name="text">
+    <string>256</string>
+   </property>
   </widget>
   <widget class="QLabel" name="l_answer">
    <property name="geometry">
@@ -69,7 +72,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>path</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="b_create_AI">
@@ -121,7 +124,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>path</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="b_do_import">
@@ -147,7 +150,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>path</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="b_path_export">
@@ -199,7 +202,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>path</string>
+    <string/>
    </property>
   </widget>
   <widget class="QGroupBox" name="gr_data_mode">
@@ -276,6 +279,26 @@
      <height>41</height>
     </rect>
    </property>
+   <item>
+    <property name="text">
+     <string>2</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>3</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>4</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>5</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="l_count_layers">
    <property name="geometry">

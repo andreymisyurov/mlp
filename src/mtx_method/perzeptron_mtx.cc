@@ -1,7 +1,7 @@
 #include "perzeptron_mtx.h"
 
 PerzeptronMtx::PerzeptronMtx(int hidden_layers): weights(new std::vector<NeuronMatrix>()) {
-  int start_rows = 256;
+  int start_rows = 512;
   if(hidden_layers > 5 || hidden_layers < 1) throw MyException("incorrect input for hidden layers");
   if(start_rows > 1024 || (start_rows / hidden_layers) <= 26) throw MyException("incorrect data for first layer");
   weights->emplace_back(std::move(NeuronMatrix(784, start_rows)));
