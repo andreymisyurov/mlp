@@ -1,5 +1,7 @@
 #include "timer.h"
 
+using namespace s21;
+
 Timer::Timer(bool){
   start();
 };

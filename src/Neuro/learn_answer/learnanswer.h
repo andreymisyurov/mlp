@@ -1,9 +1,11 @@
-#ifndef LEARNANSWER_H
-#define LEARNANSWER_H
+#ifndef SRC_NEURO_LEARNANSWER_LEARNANSWER_H
+#define SRC_NEURO_LEARNANSWER_LEARNANSWER_H
 
 #include <QWidget>
-#include <qcustomplot.h>
 #include <QVector>
+
+#include "qcustomplot.h"
+#include "ui_learnanswer.h"
 
 namespace Ui {
 class LearnAnswer;
@@ -16,10 +18,10 @@ class LearnAnswer: public QWidget {
   explicit LearnAnswer(QWidget *parent = nullptr);
   ~LearnAnswer() override;
 
-  void drawGraph(std::pair<int, std::vector<double>> in_data);
+  void drawGraph(const std::pair<int, std::vector<double>> &in_data, int in_type);
 
  private:
   Ui::LearnAnswer *m_ui;
 };
 
-#endif // LEARNANSWER_H
+#endif // SRC_NEURO_LEARNANSWER_LEARNANSWER_H

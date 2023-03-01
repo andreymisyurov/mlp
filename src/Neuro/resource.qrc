@@ -2,6 +2,9 @@
     <qresource prefix="/">
         <file alias="best_weight">resources/best_weights.bin</file>
         <file alias="crit_sound">resources/crit_sound.wav</file>
-        <file alias="icon">resources/icon.icns</file>
+        <file alias="success_sound">resources/success_sound.wav</file>
+        <file alias="start_img">resources/start_img.bmp</file>
+        <file alias="one_case">resources/one_case.txt</file>
+        <file alias="export">resources/export.txt</file>
     </qresource>
 </RCC>

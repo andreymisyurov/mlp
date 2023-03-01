@@ -1,5 +1,6 @@
 #include "neuron_matrix.h"
-// пробежаться, зарефакторить
+
+using namespace s21;
 
 NeuronMatrix::NeuronMatrix() = default;;
 NeuronMatrix::NeuronMatrix(int value): Matrix<double>(value) {};
@@ -75,13 +76,3 @@ NeuronMatrix NeuronMatrix::mulMatrix(const NeuronMatrix &other, bool swap) {
 std::shared_ptr<NeuronMatrix> NeuronMatrix::transport() {
   return std::static_pointer_cast<NeuronMatrix>(Matrix<double>::trans());
 }
-
-//auto NeuronMatrix::transpo() -> Matrix<double> * {
-//  Matrix<double>* result = new Matrix<double>(m_column, m_row);
-//  for(int i = 0; i < result->m_row; ++i) {
-//    for(int j = 0; j < result->m_column; ++j) {
-//      result->m_matrix[i][j] = m_matrix[j][i];
-//    }
-//  }
-//  return result;
-//}

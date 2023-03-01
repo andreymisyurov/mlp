@@ -9,14 +9,16 @@
 #include "neuron_matrix.h"
 #include "thread_pool.h"
 
+namespace s21 {
+
 // константа для нормализации значений матрицы
 inline constexpr double kNORMA = 255.;
 
-class Parser {
   /** Клас Parser реализован с использованием многопоточности.\n
-   * Методы данного класса статические, могут парсить данные из файла для входного слоя нейронной сети, также импортировать
-   * и экспортировать матрицы весов
+   * Методы данного класса статические, могут парсить данные из файла для
+   * входного слоя нейронной сети, также импортировать и экспортировать матрицы весов
    */
+class Parser {
  public:
   /** СТАТИЧЕСКИЙ МЕТОД parseDataBase. Парсит базу данных из файла.\n
    * Первое значение - это ожидаемый правильный ответ, далее через запятую и пробел 784(матрица 28х28)\n
@@ -28,7 +30,8 @@ class Parser {
    * где first - ожидаемое значение,\n
    * а second - матрица входного слоя прошедшая нормализацию(с вещественными значениями от 0 до 1)
    */
-  static auto parseDataBase(const std::string &in_path, double in_data_part) -> std::vector<std::pair<int, NeuronMatrix>>;
+  auto static parseDataBase(const std::string &in_path,
+                                                    double in_data_part) -> std::vector<std::pair<int, NeuronMatrix>>;
 
   /** СТАТИЧЕСКИЙ МЕТОД exportDataBase. Выгружает данные из матрицы весов по определенному пути на локальный диск.\n
    * Если файла не существует - создаст. Если существует - перезапишет.
@@ -36,16 +39,16 @@ class Parser {
    * @param in_path абсолютный путь для сохранения данных.
    * @param in_weight вектор матриц со значениями весов.
    */
-  static auto export_data(const std::string &in_path, const std::vector<NeuronMatrix> *in_weight) -> void;
+  auto static export_data(const std::string &in_path,
+                             const std::vector<NeuronMatrix> *in_weight) -> void;
 
   /** СТАТИЧЕСКИЙ МЕТОД exportDataBase. Загружает данные из файла на жестком диске в матрицу весов.
    *
    * @param in_path абсолютный путь к файлу с базой данных
    * @param inout_weight результирующий аргумент, указатель на матрицу весов
    */
-  static auto import_data(const std::string &in_path, std::vector<NeuronMatrix> *inout_weight) -> void;
-  // функция исключительно для тестов, утилизировать
-  static NeuronMatrix parse_one_mtrx(const std::string &in_path);
+  auto static import_data(const std::string &in_path,
+                                std::vector<NeuronMatrix> *inout_weight) -> void;
 
  private:
   /** СТАТИЧЕСКИЙ МЕТОД parseOneLine. Приватная функция для реализации многопоточности.
@@ -57,8 +60,12 @@ class Parser {
    * состоящий из пар(правильный ответ, матрица). Для работы с ним используется мьютекс
    * @param in_mtx указатель на мьютекс для работы с общедоступным указателем на вектор в потоках
    */
-  static auto parseOneLine(std::string &in_line, std::vector<std::pair<int, NeuronMatrix>> *inout_result, std::mutex *in_mtx) -> void;
+  static auto parseOneLine(std::string &in_line,
+        std::vector<std::pair<int, NeuronMatrix>> *inout_result,
+                                                std::mutex *in_mtx)      -> void;
   ~Parser();
 };
+
+} // namespace s21
 
 #endif //SRC_PARSER_PARSER_H_

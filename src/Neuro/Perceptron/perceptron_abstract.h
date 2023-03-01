@@ -1,23 +1,20 @@
 #ifndef SRC_PERCEPTRON_PERCEPTRON_ABSTRACT_H_
 #define SRC_PERCEPTRON_PERCEPTRON_ABSTRACT_H_
 
-#include "../Matrix/neuron_matrix.h"
+#include "neuron_matrix.h"
 
-typedef struct analytical_data {
+namespace s21 {
+
 /** СТРУКТУРА С АНАЛИТИЧЕСКИМИ ДАННЫМИ\n
- *
  * average_accuracy - средняя точность предсказаний по выборке\n\n
- *
  * precision - количество объектов, которые сеть указала как положительные и была права\n\n
- *
  * recall - показывает, какую долю объектов положительного класса
  * из всех объектов положительного класса нашел алгоритм.\n\n
- *
  * f_measure - объединение precision и recall в агрегированный
  * критерий качества (среднее гармоническое precision и recall)\n\n
- *
  * time - затраченное на тестирование время\n\n
  */
+typedef struct analytical_data {
   double average_accuracy;
   double precision;
   double recall;
@@ -25,12 +22,12 @@ typedef struct analytical_data {
   double time;
 } analytical_data;
 
-class Perceptron {
   /**
    * АБСТРАКТНЫЙ КЛАСС Perceptron.
    * Под методы данного класс реализовано UI в QT.\n
    * В проект реализовано две структуры. Матричная и графовая.
    */
+class Perceptron {
  public:
   /** МЕТОД learn. Функция обучает нейросеть, и возвращает график с изменением ошибки во время обучения
    * принимает путь к данным в формате .csv\n
@@ -46,6 +43,20 @@ class Perceptron {
    * а второй - это вектор из 176.000 элементов средних ошибок на каждый кейс
    */
   virtual auto learn(const std::string &in_path, int in_epochs) -> std::pair<int, std::vector<double>> = 0;
+
+
+  /** МЕТОД crossValidation. Способ обучения при которая база даных разбивается на in_k количество частей.
+   * Особым образом обучается и тестируется на этих кусках базы.
+   *
+   * @param in_path путь к файлу с обучающим материалом
+   * @param in_k коэффициент кросс-валидации
+   * @return Пара необходимая для построения выходного графика.\n
+   * first - количество коэффициент кросс валидации.\n
+   * second - вектор со средней ошибкой на каждый шаг кросс валидации.\n
+   * То есть если коэффициент равен 3 то график должен отображать изменение ошибки
+   * на протяжении обучения по каждому шагу кросс валидации
+   */
+  virtual auto crossValidation(const std::string &in_path, int in_k) -> std::pair<int, std::vector<double>> = 0;
 
   /** МЕТОД test. Тестирует эффективность нейросети.
    * Задействует только back-propagation и формирует аналитический отчет.
@@ -93,13 +104,16 @@ class Perceptron {
    */
   virtual auto exportDataBase(const std::string &in_path) -> void = 0;
 
-  /** МЕТОД exportDataBase. Подгружает веса из базы данных в определенном виде, аналогичном как в методе importDataBase.
+  /** МЕТОД exportDataBase. Подгружает веса из базы данных в определенном виде,
+   * аналогичном как в методе importDataBase.
    *
    * @param in_path абсолютный путь куда импортировать данные
    */
-  virtual auto importDataBase(const std::string &in_path) -> void= 0;
+  virtual auto importDataBase(const std::string &in_path) -> void = 0;
 
   virtual ~Perceptron() = default;;
 };
+
+} // namespace s21
 
 #endif // SRC_PERCEPTRON_PERCEPTRON_ABSTRACT_H_

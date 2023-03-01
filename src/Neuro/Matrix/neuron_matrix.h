@@ -3,7 +3,7 @@
 
 #include "my_matrix.h"
 
-// транспонс
+namespace s21 {
 
 class NeuronMatrix: public Matrix<double> {
  private:
@@ -22,5 +22,7 @@ class NeuronMatrix: public Matrix<double> {
   NeuronMatrix transpose() = delete;
   std::shared_ptr<NeuronMatrix> transport();
 };
+
+} // namespace s21
 
 #endif // SRC_MATRIX_NEURON_MATRIX_H

@@ -1,20 +1,24 @@
 #ifndef SRC_MATRIX_MY_MATRIX_H_
 #define SRC_MATRIX_MY_MATRIX_H_
-// функция транспонс
 
 #include <cmath>
 #include <exception>
 #include <string>
 
+namespace s21 {
+
 inline constexpr auto EPS = 1e-6;
 
 class MyException: std::exception {
  public:
-  explicit MyException(std::string &&ex_text) noexcept : m_text(std::move(ex_text)) {}
-  explicit MyException(const std::string &ex_text) noexcept : m_text(ex_text) {}
+  explicit MyException(std::string &&ex_text) noexcept: m_text(std::move(ex_text)) {
+  }
+  explicit MyException(const std::string &ex_text) noexcept: m_text(ex_text) {
+  }
   ~MyException() override = default;
-  const char *what() const
-  noexcept override {return m_text.c_str();}
+  const char *what() const noexcept override {
+    return m_text.c_str();
+  }
 
  protected:
   std::string m_text;
@@ -23,9 +27,19 @@ class MyException: std::exception {
 template<typename T>
 class Matrix {
  public:
+  virtual std::shared_ptr<Matrix<T>> trans() {
+    auto result = std::make_shared<Matrix<T>>(m_column, m_row);
+    for(int i = 0; i < m_row; ++i) {
+      for(int j = 0; j < m_column; ++j) {
+        result->m_matrix[j][i] = m_matrix[i][j];
+      }
+    }
+    return result;
+  }
+
   explicit Matrix(int value);
   Matrix(int value_row, int value_column);
-  Matrix(Matrix<T> &&other) noexcept ;
+  Matrix(Matrix<T> &&other) noexcept;
   Matrix(const Matrix &other);
   ~Matrix() {
     remove();
@@ -34,8 +48,12 @@ class Matrix {
   Matrix() = default;;
 
  public:
-  auto getColum() const -> int { return m_column; };
-  auto getRow() const -> int { return m_row; };
+  auto getColum() const -> int {
+    return m_column;
+  };
+  auto getRow() const -> int {
+    return m_row;
+  };
   auto setRow(int x) -> void;
   auto setColum(int x) -> void;
 
@@ -47,30 +65,8 @@ class Matrix {
   auto mulNumber(T num) -> void;
   auto mulMatrix(const Matrix<T> &other) -> void;
   auto determinant() -> double;
-  virtual auto transpo() -> Matrix<T>*;
+  virtual auto transpo() -> Matrix<T> *;
   auto transpose() -> Matrix<T>;
-
-
-//  std::shared_ptr<Base> p = std::make_shared<Derived>()
-
-  virtual std::shared_ptr<Matrix<T>> trans() {
-    auto result = std::make_shared<Matrix<T>>(m_column, m_row);
-    for (int i = 0; i < m_row; ++i) {
-      for (int j = 0; j < m_column; ++j) {
-        result->m_matrix[j][i] = m_matrix[i][j];
-      }
-    }
-    return result;
-  }
-//  virtual Matrix<T>* trans() {
-//    auto result = new Matrix<T>(m_column, m_row);
-//    for (int i = 0; i < m_row; ++i) {
-//      for (int j = 0; j < m_column; ++j) {
-//        result->m_matrix[j][i] = m_matrix[i][j];
-//      }
-//    }
-//    return result;
-//  }
 
 
   auto calcComplements() -> Matrix<T>;
@@ -156,7 +152,7 @@ Matrix<T>::Matrix(int value_row, int value_column) {
 }
 
 template<typename T>
-Matrix<T>::Matrix(Matrix<T> &&other) noexcept{
+Matrix<T>::Matrix(Matrix<T> &&other) noexcept {
   *this = other;
 }
 
@@ -301,7 +297,7 @@ Matrix<T> Matrix<T>::transpose() {
 
 template<typename T>
 auto Matrix<T>::transpo() -> Matrix<T> * {
-  Matrix* result = new Matrix<T>(m_column, m_row);
+  Matrix *result = new Matrix<T>(m_column, m_row);
   for(int i = 0; i < result->m_row; ++i) {
     for(int j = 0; j < result->m_column; ++j) {
       result->m_matrix[i][j] = m_matrix[j][i];
@@ -462,5 +458,7 @@ void Matrix<T>::checkConstructor(int value_row, int value_column) {
   if(value_column < 1 || value_row < 1)
     throw MyException("Bad value for row or colum.");
 }
+
+} // namespace s21
 
 #endif // SRC_MATRIX_MY_MATRIX_H_
