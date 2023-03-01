@@ -1,34 +1,47 @@
 #include "parser.h"
 #include "./Timer/timer.h"
 #include "./mtx_method/perzeptron_mtx.h"
-#include <time.h>
-#include <unistd.h>
+#include "./Matrix/neuron_matrix.h"
+#include <iostream>
 
+// just multiple: start = 256, layers = 2, step = 0.15
+// Time of execute: 888.986s, accuracy = 0.790878%
+
+// emplace and std::move: start = 256, layers = 2, step = 0.15
+// Time of execute: 827.604s, accuracy = 0.787568%
 
 int main() {
-//  Parser temp;
-//  Matrix<double> test = temp.parse_one_mtrx("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/one_al.txt");
-  PerzeptronMtx alfa;
-//  std::cout << alfa.predict(test, 3);
-  Timer timer_learn;
-  timer_learn.Start();
-  alfa.learn("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/emnist-letters/emnist-letters-train.csv");
-//  alfa.learn("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/emnist-letters/emnist-letters-train.csv");
-  timer_learn.Stop();
-  timer_learn.ShowTime();
-
-std::cout << std::endl;
-
+  PerzeptronMtx alfa = PerzeptronMtx(2);
   Timer timer_test;
   timer_test.Start();
-  std:: cout << alfa.test("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/emnist-letters/emnist-letters-test.csv") << std::endl;
+
+
+//  alfa.learn("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/emnist-letters/emnist-letters-train.csv");
+//  alfa.learn("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/one_al.txt", 1);
+  alfa.imp("/Users/gonzo/program/school21/general/CPP7_MLP-0/data.txt");
+
+  auto accuracy = alfa.test("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/emnist-letters/emnist-letters-test.csv");
+
   timer_test.Stop();
   timer_test.ShowTime();
 
+  std::cout << accuracy;
 
+//  PerzeptronMtx tests = PerzeptronMtx(2);
+//  Timer timer_test1;
+//  timer_test1.Start();
 
+//  tests.learn("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/emnist-letters/emnist-letters-train.csv");
+//  alfa.learn("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/one_al.txt", 1);
+//  tests.exp();
+//  tests.imp();
 
-//  Matrix<int> t1(7, 6);
-//  Matrix<int> t2(6, 11);
+//  auto accuracy1 = tests.test("/Users/gonzo/program/school21/general/CPP7_MLP-0/datasets/emnist-letters/emnist-letters-test.csv");
+
+//  timer_test1.Stop();
+//  timer_test1.ShowTime();
+
+//  std::cout << accuracy1;
+
   return 0;
 }
