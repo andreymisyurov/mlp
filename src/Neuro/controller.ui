@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Controller</class>
+ <widget class="QWidget" name="Controller">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Controller</string>
+  </property>
+  <widget class="QLineEdit" name="le_neurons_first_layer">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>484</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="l_answer">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>40</y>
+     <width>191</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>_________answer__________</string>
+   </property>
+  </widget>
+  <widget class="QGraphicsView" name="graphic_scene">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>420</width>
+     <height>420</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_do_learn">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>260</y>
+     <width>61</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="l_path_import">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>410</y>
+     <width>221</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>path</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_create_AI">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>514</y>
+     <width>221</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>create AI</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_do_export">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>510</y>
+     <width>61</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_path_import">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>430</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>import</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="l_path_learn">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>240</y>
+     <width>221</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>path</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_do_import">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>430</y>
+     <width>61</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="l_path_export">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>490</y>
+     <width>221</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>path</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_path_export">
+   <property name="geometry">
+    <rect>
+     <x>469</x>
+     <y>510</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>export</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_predict">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>160</y>
+     <width>231</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>predict</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_do_test">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>350</y>
+     <width>61</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="l_path_test">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>330</y>
+     <width>221</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>path</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="gr_data_mode">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>464</y>
+     <width>120</width>
+     <height>80</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>data mode</string>
+   </property>
+   <widget class="QRadioButton" name="rb_matrix_mode">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>99</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>matrix</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rb_graph_mode">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>99</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>graph</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="b_path_learn">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>260</y>
+     <width>231</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>learn</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="b_path_test">
+   <property name="geometry">
+    <rect>
+     <x>469</x>
+     <y>350</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>test</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cb_count_hidden_layers">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>474</y>
+     <width>111</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="l_count_layers">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>454</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>count hidden layers</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="l_neuron_first_layer">
+   <property name="geometry">
+    <rect>
+     <x>299</x>
+     <y>450</y>
+     <width>151</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>neurons for 1 hid layer</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

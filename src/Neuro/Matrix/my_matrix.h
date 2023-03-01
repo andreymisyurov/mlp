@@ -1,10 +1,8 @@
-#ifndef MY_MATRIX_H_
-#define MY_MATRIX_H_
+#pragma once
 
 #include <cmath>
 #include <exception>
-#include <typeinfo>
-#include <iostream>
+#include <string>
 
 namespace victoriv {
 
@@ -12,48 +10,42 @@ inline constexpr auto EPS = 1e-6;
 
 class MyException: std::exception {
  public:
-  explicit MyException(std::string &&ex_text)
-  noexcept : m_text(std::move(ex_text)) {}
-  explicit MyException(const std::string &ex_text)
-  noexcept : m_text(ex_text) {}
-  ~MyException()
-  noexcept =
-  default;
+  explicit MyException(std::string &&ex_text) noexcept : m_text(std::move(ex_text)) {}
+  explicit MyException(const std::string &ex_text) noexcept : m_text(ex_text) {}
+  ~MyException() override = default;
   const char *what() const
-  noexcept override{return m_text.c_str();}
+  noexcept override {return m_text.c_str();}
 
- private:
+ protected:
   std::string m_text;
 };
 
 template<typename T>
 class Matrix {
  public:
-  auto getColum() -> int {
-    return m_column;
-  };
-  auto getRow() -> int {
-    return m_row;
-  };
-  auto setRow(int x) -> void;
-  auto setColum(int x) -> void;
-
- public:
-  Matrix() = delete;
   explicit Matrix(int value);
   Matrix(int value_row, int value_column);
-  Matrix(Matrix<T> &&other);
+  Matrix(Matrix<T> &&other) noexcept ;
   Matrix(const Matrix &other);
   ~Matrix() {
     remove();
   }
+ protected:
+  Matrix() = default;;
+
+ public:
+  auto getColum() const -> int { return m_column; };
+  auto getRow() const -> int { return m_row; };
+  auto setRow(int x) -> void;
+  auto setColum(int x) -> void;
+
 
  public:
   auto eqMatrix(const Matrix<T> &other) const -> bool;
   auto sumMatrix(const Matrix<T> &other) -> void;
   auto subMatrix(const Matrix<T> &other) -> void;
   auto mulNumber(T num) -> void;
-  auto mulMatrix(const Matrix<T> &other, bool sigmoid = false, bool change = true, bool multithread = false) -> Matrix<T>;
+  auto mulMatrix(const Matrix<T> &other) -> void;
   auto determinant() -> double;
   auto transpose() -> Matrix<T>;
   auto calcComplements() -> Matrix<T>;
@@ -68,7 +60,20 @@ class Matrix {
   auto operator-=(const Matrix<T> &other) -> Matrix<T>;
   auto operator*=(T &&value) -> Matrix<T>;
   auto operator*=(const T &value) -> Matrix<T>;
-  auto operator()(int i, int j) -> T &;
+
+  auto operator()(int i, int j) -> T & {
+    if(i < 0 || j < 0 || i >= m_row || j >= m_column) throw MyException("Nothing to get");
+    return m_matrix[i][j];
+  }
+
+  auto operator()(int i, int j) const -> T {
+    if(i < 0 || j < 0 || i >= m_row || j >= m_column) {
+      throw MyException("Nothing to get");
+    }
+    auto result = m_matrix[i][j];
+    return result;
+  };
+
   auto operator*(const Matrix<T> &other) -> Matrix<T>;
   auto operator*(T &&value) -> Matrix<T>;
   auto operator*(const T &value) -> Matrix<T>;
@@ -99,22 +104,17 @@ class Matrix {
 };
 
 template<typename T>
-std::ostream &operator<<(std::ostream &os, Matrix<T> &mtx) {
+std::ostream &operator<<(std::ostream &os, const Matrix<T> &mtx) {
   std::string line = "";
   for(int i = 0; i < mtx.getRow(); ++i) {
     for(int j = 0; j < mtx.getColum(); ++j) {
-      line += std::to_string(mtx(i, j));
-      line += " ";
+      std::string temp = std::to_string(mtx(i, j)).substr(0, 6);
+      line += temp;
+      line += "  ";
     }
     line += "\n";
   }
   return os << line;
-}
-
-template<typename T>
-std::ostream &operator<<(std::ostream &os, Matrix<T> &&mtx) {
-  auto temp = mtx;
-  return os << temp;;
 }
 
 template<typename T>
@@ -131,7 +131,7 @@ Matrix<T>::Matrix(int value_row, int value_column) {
 }
 
 template<typename T>
-Matrix<T>::Matrix(Matrix<T> &&other) {
+Matrix<T>::Matrix(Matrix<T> &&other) noexcept{
   *this = other;
 }
 
@@ -170,9 +170,7 @@ void Matrix<T>::setColum(int new_column) {
 template<typename T>
 Matrix<T> Matrix<T>::inverseMatrix() {
   double determ = determinant();
-  if(determ == 0) {
-    throw MyException("Matrix's determinant is zero");
-  }
+  if(determ == 0) throw MyException("Matrix's determinant is zero");
   Matrix<T> temp = calcComplements();
   Matrix<T> result = temp.transpose();
   result.mulNumber(1. / determ);
@@ -250,7 +248,7 @@ void Matrix<T>::mulNumber(T num) {
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::mulMatrix(const Matrix<T> &other, bool sigmoid, bool change, bool multithread) {
+void Matrix<T>::mulMatrix(const Matrix<T> &other) {
   checkForMult(other);
   Matrix<T> result(m_row, other.m_column);
   for(int i = 0; i < result.m_row; ++i) {
@@ -259,21 +257,10 @@ Matrix<T> Matrix<T>::mulMatrix(const Matrix<T> &other, bool sigmoid, bool change
       for(int k = 0; k < m_column; ++k) {
         result.m_matrix[i][j] += m_matrix[i][k] * other.m_matrix[k][j];
       }
-      if(sigmoid) {
-        if((typeid(T) == typeid(double)) || (typeid(T) == typeid(float))) {
-          result.m_matrix[i][j] = 1. / (1 + exp(-result.m_matrix[i][j]));
-        } else {
-          throw MyException("Incorrect typedef for find sigmoid");
-        }
-      }
     }
   }
-  if(change) {
-    std::swap(*this, result);
-    return *this;
-  } else {
-    return result;
-  }
+
+  std::swap(*this, result);
 }
 
 template<typename T>
@@ -374,14 +361,6 @@ Matrix<T> Matrix<T>::operator*=(const T &value) {
 }
 
 template<typename T>
-T &Matrix<T>::operator()(int i, int j) {
-  if(i < 0 || j < 0 || i >= m_row || j >= m_column) {
-    throw MyException("Nothing to get");
-  }
-  return m_matrix[i][j];
-}
-
-template<typename T>
 void Matrix<T>::remove() {
   for(int i = 0; i < m_row; ++i) {
     delete[] m_matrix[i];
@@ -449,5 +428,3 @@ void Matrix<T>::checkConstructor(int value_row, int value_column) {
 }
 
 }  // namespace victoriv
-
-#endif  // MY_MATRIX_H_

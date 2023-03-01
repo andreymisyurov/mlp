@@ -1,5 +1,4 @@
-#ifndef MY_MATRIX_H_
-#define MY_MATRIX_H_
+#pragma once
 
 #include <cmath>
 #include <exception>
@@ -13,9 +12,9 @@ class MyException: std::exception {
  public:
   explicit MyException(std::string &&ex_text) noexcept : m_text(std::move(ex_text)) {}
   explicit MyException(const std::string &ex_text) noexcept : m_text(ex_text) {}
-  ~MyException() noexcept = default;
+  ~MyException() override = default;
   const char *what() const
-  noexcept override{return m_text.c_str();}
+  noexcept override {return m_text.c_str();}
 
  protected:
   std::string m_text;
@@ -24,24 +23,22 @@ class MyException: std::exception {
 template<typename T>
 class Matrix {
  public:
-  auto getColum() const -> int {
-    return m_column;
-  };
-  auto getRow() const -> int {
-    return m_row;
-  };
-  auto setRow(int x) -> void;
-  auto setColum(int x) -> void;
-
- public:
-  Matrix() = delete;
   explicit Matrix(int value);
   Matrix(int value_row, int value_column);
-  Matrix(Matrix<T> &&other);
+  Matrix(Matrix<T> &&other) noexcept ;
   Matrix(const Matrix &other);
   ~Matrix() {
     remove();
   }
+ protected:
+  Matrix() = default;;
+
+ public:
+  auto getColum() const -> int { return m_column; };
+  auto getRow() const -> int { return m_row; };
+  auto setRow(int x) -> void;
+  auto setColum(int x) -> void;
+
 
  public:
   auto eqMatrix(const Matrix<T> &other) const -> bool;
@@ -65,9 +62,7 @@ class Matrix {
   auto operator*=(const T &value) -> Matrix<T>;
 
   auto operator()(int i, int j) -> T & {
-    if(i < 0 || j < 0 || i >= m_row || j >= m_column) {
-      throw MyException("Nothing to get");
-    }
+    if(i < 0 || j < 0 || i >= m_row || j >= m_column) throw MyException("Nothing to get");
     return m_matrix[i][j];
   }
 
@@ -136,7 +131,7 @@ Matrix<T>::Matrix(int value_row, int value_column) {
 }
 
 template<typename T>
-Matrix<T>::Matrix(Matrix<T> &&other) {
+Matrix<T>::Matrix(Matrix<T> &&other) noexcept{
   *this = other;
 }
 
@@ -175,9 +170,7 @@ void Matrix<T>::setColum(int new_column) {
 template<typename T>
 Matrix<T> Matrix<T>::inverseMatrix() {
   double determ = determinant();
-  if(determ == 0) {
-    throw MyException("Matrix's determinant is zero");
-  }
+  if(determ == 0) throw MyException("Matrix's determinant is zero");
   Matrix<T> temp = calcComplements();
   Matrix<T> result = temp.transpose();
   result.mulNumber(1. / determ);
@@ -367,14 +360,6 @@ Matrix<T> Matrix<T>::operator*=(const T &value) {
   return *this;
 }
 
-//template<typename T>
-//T &Matrix<T>::operator()(int i, int j) {
-//  if(i < 0 || j < 0 || i >= m_row || j >= m_column) {
-//    throw MyException("Nothing to get");
-//  }
-//  return m_matrix[i][j];
-//}
-
 template<typename T>
 void Matrix<T>::remove() {
   for(int i = 0; i < m_row; ++i) {
@@ -443,5 +428,3 @@ void Matrix<T>::checkConstructor(int value_row, int value_column) {
 }
 
 }  // namespace victoriv
-
-#endif  // MY_MATRIX_H_
