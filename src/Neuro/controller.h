@@ -3,19 +3,21 @@
 
 #include <QResizeEvent>
 
-#include "ui_controller.h"
-#include "paintscene.h"
 #include "assistant.h"
 #include "learnanswer.h"
+#include "paintscene.h"
+#include "ui_controller.h"
 
 using namespace s21;
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class Controller; }
+namespace Ui {
+class Controller;
+}
 QT_END_NAMESPACE
 
-class Controller: public QWidget {
- Q_OBJECT
+class Controller : public QWidget {
+  Q_OBJECT
 
  public:
   explicit Controller(QWidget *parent = nullptr);
@@ -47,4 +49,4 @@ class Controller: public QWidget {
   const QString k_SUCCESS_SOUND = ":/success_sound";
 };
 
-#endif // SRC_NEURO_ASSISTANT_CONTROLLER_H
+#endif  // SRC_NEURO_ASSISTANT_CONTROLLER_H

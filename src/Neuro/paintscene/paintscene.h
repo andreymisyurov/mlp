@@ -7,8 +7,7 @@
 
 namespace s21 {
 
-class PaintScene: public QGraphicsScene {
-
+class PaintScene : public QGraphicsScene {
  public:
   explicit PaintScene(QObject *parent = nullptr);
   ~PaintScene() override;
@@ -21,6 +20,6 @@ class PaintScene: public QGraphicsScene {
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
-} // namespace s21
+}  // namespace s21
 
-#endif // SRC_NEURO_PAINTSCENE_PAINTSCENE_H
+#endif  // SRC_NEURO_PAINTSCENE_PAINTSCENE_H

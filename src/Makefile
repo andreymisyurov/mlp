@@ -28,11 +28,7 @@ clean:
 	rm -rf build doc dist
 
 clang-format:
-	@cp ../materials/linters/.clang-format .
-	@clang-format -i *.cc
-	@clang-format -i *.h
+	sh clang.sh
 
 clang:
-	@cp ../materials/linters/.clang-format .
-	@clang-format -n *.cc
-	@clang-format -n *.h
+	sh clang_check.sh

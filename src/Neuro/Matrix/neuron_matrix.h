@@ -5,7 +5,7 @@
 
 namespace s21 {
 
-class NeuronMatrix: public Matrix<double> {
+class NeuronMatrix : public Matrix<double> {
  private:
   NeuronMatrix();
 
@@ -14,15 +14,17 @@ class NeuronMatrix: public Matrix<double> {
   NeuronMatrix(int value_row, int value_column);
   NeuronMatrix(NeuronMatrix &&other) noexcept;
   NeuronMatrix(const NeuronMatrix &other);
-  auto operator=(const NeuronMatrix &other) -> NeuronMatrix &;
-  auto operator=(NeuronMatrix &&other) noexcept -> NeuronMatrix &;
-  NeuronMatrix operator*(const NeuronMatrix &other);
-  NeuronMatrix mulMatrix(const NeuronMatrix &other, bool sigmoid, bool swap);
-  NeuronMatrix mulMatrix(const NeuronMatrix &other, bool swap = true);
+
+ public:
+  auto operator=(const NeuronMatrix &other)                           -> NeuronMatrix &;
+  auto operator=(NeuronMatrix &&other) noexcept                       -> NeuronMatrix &;
+  auto operator*(const NeuronMatrix &other)                           -> NeuronMatrix;
+  auto mulMatrix(const NeuronMatrix &other, bool sigmoid, bool swap)  -> NeuronMatrix;
+  auto mulMatrix(const NeuronMatrix &other, bool swap = true)         -> NeuronMatrix;
   NeuronMatrix transpose() = delete;
   std::shared_ptr<NeuronMatrix> transport();
 };
 
-} // namespace s21
+}  // namespace s21
 
-#endif // SRC_MATRIX_NEURON_MATRIX_H
+#endif  // SRC_MATRIX_NEURON_MATRIX_H

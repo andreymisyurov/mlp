@@ -2,29 +2,27 @@
 
 using namespace s21;
 
-Timer::Timer(bool){
-  start();
-};
+Timer::Timer(bool) { start(); };
 
-auto Timer::start() -> void {
+void Timer::start() {
   m_start = std::chrono::high_resolution_clock::now();
 }
 
-auto Timer::stop() -> void {
+void Timer::stop() {
   m_end = std::chrono::high_resolution_clock::now();
 };
 
-auto Timer::showTime() -> void {
+void Timer::showTime() {
   std::chrono::duration<float> duration = m_end - m_start;
   std::cout << "Time of execute: " << duration.count() << std::endl;
 }
 
-auto Timer::showTime(const std::string& in_message) -> void {
+void Timer::showTime(const std::string& in_message) {
   std::chrono::duration<float> duration = m_end - m_start;
   std::cout << in_message << duration.count() << " sec" << std::endl;
 }
 
-auto Timer::getTime() -> float {
+float Timer::getTime() {
   std::chrono::duration<float> duration = m_end - m_start;
   return duration.count();
 }

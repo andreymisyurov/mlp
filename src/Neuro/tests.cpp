@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
+
 #include <exception>
 
 #include "neuron_matrix.h"
-#include "perzeptron_mtx.h"
-#include "perzeptron_grph.h"
 #include "parser.h"
+#include "perzeptron_grph.h"
+#include "perzeptron_mtx.h"
 
 using namespace s21;
 
@@ -60,7 +61,6 @@ TEST(neuro_const_copy, ex_2) {
   ex_4 = ex_2;
 }
 
-
 TEST(neuro_const, ex_1) {
   NeuronMatrix ex(2);
   ex(0, 0) = 1.;
@@ -68,8 +68,8 @@ TEST(neuro_const, ex_1) {
   ex(1, 0) = 3.;
   ex(1, 1) = 4.;
   Matrix copy = ex;
-  for(int i = 0; i < ex.getRow(); ++i) {
-    for(int j = 0; j < ex.getColum(); ++j) {
+  for (int i = 0; i < ex.getRow(); ++i) {
+    for (int j = 0; j < ex.getColum(); ++j) {
       GTEST_ASSERT_EQ(copy(i, j), ex(i, j));
     }
   }
@@ -82,8 +82,8 @@ TEST(copy_constr, example_1) {
   ex(1, 0) = 3;
   ex(1, 1) = 4;
   Matrix copy = ex;
-  for(int i = 0; i < ex.getRow(); ++i) {
-    for(int j = 0; j < ex.getColum(); ++j) {
+  for (int i = 0; i < ex.getRow(); ++i) {
+    for (int j = 0; j < ex.getColum(); ++j) {
       GTEST_ASSERT_EQ(copy(i, j), ex(i, j));
     }
   }
@@ -313,8 +313,8 @@ TEST(transpose, example_1) {
   second(2, 0) = 3;
   second(2, 1) = 6;
   Matrix ex = first.transpose();
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       GTEST_ASSERT_EQ(ex(i, j), second(i, j));
     }
   }
@@ -332,8 +332,8 @@ TEST(transpose, example_2) {
   second(1, 0) = 2;
   second(1, 1) = 4;
   Matrix<short> ex = first.transpose();
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       GTEST_ASSERT_EQ(ex(i, j), second(i, j));
     }
   }
@@ -345,8 +345,8 @@ TEST(transpose, example_3) {
   Matrix<char> second(1);
   second(0, 0) = 1;
   Matrix<char> ex = first.transpose();
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       GTEST_ASSERT_EQ(ex(i, j), second(i, j));
     }
   }
@@ -384,8 +384,8 @@ TEST(sum, example_1) {
   result(2, 1) = 0;
   result(2, 2) = 0;
   first.sumMatrix(second);
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -408,8 +408,8 @@ TEST(sum, example_2) {
   result(1, 0) = 0;
   result(1, 1) = 0;
   first.sumMatrix(second);
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       EXPECT_NEAR(first(i, j), result(i, j), EPS);
     }
   }
@@ -447,8 +447,8 @@ TEST(sub, example_1) {
   result(2, 1) = 0;
   result(2, 2) = 0;
   first.subMatrix(second);
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -471,8 +471,8 @@ TEST(sub, example_2) {
   result(1, 0) = 0.;
   result(1, 1) = 0.;
   first.subMatrix(second);
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       EXPECT_NEAR(first(i, j), result(i, j), EPS);
     }
   }
@@ -490,8 +490,8 @@ TEST(mulNumber, example_1) {
   result(1, 0) = 3. * 5.;
   result(1, 1) = 4. * 5.;
   first.mulNumber(5.0);
-  for(int i = 0; i < first.getRow(); i++) {
-    for(int j = 0; j < first.getColum(); j++) {
+  for (int i = 0; i < first.getRow(); i++) {
+    for (int j = 0; j < first.getColum(); j++) {
       EXPECT_NEAR(first(i, j), result(i, j), EPS);
     }
   }
@@ -509,8 +509,8 @@ TEST(mulNumber, example_2) {
   result(1, 0) = 3 * 0.;
   result(1, 1) = 4 * 0.;
   first.mulNumber(0.000000001);
-  for(int i = 0; i < first.getRow(); ++i) {
-    for(int j = 0; j < first.getColum(); ++j) {
+  for (int i = 0; i < first.getRow(); ++i) {
+    for (int j = 0; j < first.getColum(); ++j) {
       EXPECT_NEAR(first(i, j), result(i, j), EPS);
     }
   }
@@ -528,8 +528,8 @@ TEST(mulNumber, example_3) {
   result(1, 0) = 3.;
   result(1, 1) = 4.;
   first.mulNumber(1.0);
-  for(int i = 0; i < first.getRow(); i++) {
-    for(int j = 0; j < first.getColum(); j++) {
+  for (int i = 0; i < first.getRow(); i++) {
+    for (int j = 0; j < first.getColum(); j++) {
       EXPECT_NEAR(first(i, j), result(i, j), EPS);
     }
   }
@@ -547,8 +547,8 @@ TEST(mulNumber, example_4) {
   result(1, 0) = -3.;
   result(1, 1) = -4.;
   first.mulNumber(-1.0);
-  for(int i = 0; i < first.getRow(); i++) {
-    for(int j = 0; j < first.getColum(); j++) {
+  for (int i = 0; i < first.getRow(); i++) {
+    for (int j = 0; j < first.getColum(); j++) {
       EXPECT_NEAR(first(i, j), result(i, j), EPS);
     }
   }
@@ -580,8 +580,8 @@ TEST(mulMatrix, example_1) {
   result(2, 1) = 15;
   result(2, 2) = 27;
   first.mulMatrix(second);
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       EXPECT_NEAR(first(i, j), result(i, j), EPS);
     }
   }
@@ -604,8 +604,8 @@ TEST(mulMatrix, example_2) {
   result(1, 0) = 3;
   result(1, 1) = 3;
   first.mulMatrix(second);
-  for(int i = 0; i < first.getRow(); i++) {
-    for(int j = 0; j < first.getColum(); j++) {
+  for (int i = 0; i < first.getRow(); i++) {
+    for (int j = 0; j < first.getColum(); j++) {
       EXPECT_NEAR(first(i, j), result(i, j), EPS);
     }
   }
@@ -633,8 +633,8 @@ TEST(calcComplements, example_1) {
   result(2, 0) = -8;
   result(2, 1) = -2;
   result(2, 2) = 4;
-  for(int i = 0; i < first.getRow(); i++) {
-    for(int j = 0; j < first.getColum(); j++) {
+  for (int i = 0; i < first.getRow(); i++) {
+    for (int j = 0; j < first.getColum(); j++) {
       EXPECT_NEAR(second(i, j), result(i, j), EPS);
     }
   }
@@ -662,8 +662,8 @@ TEST(calcComplements, example_2) {
   result(2, 0) = -1;
   result(2, 1) = 34;
   result(2, 2) = -24;
-  for(int i = 0; i < first.getRow(); i++) {
-    for(int j = 0; j < first.getColum(); j++) {
+  for (int i = 0; i < first.getRow(); i++) {
+    for (int j = 0; j < first.getColum(); j++) {
       EXPECT_NEAR(second(i, j), result(i, j), EPS);
     }
   }
@@ -681,8 +681,8 @@ TEST(inverseMatrix, example_1) {
   result(1, 0) = 1. / 3;
   result(1, 1) = -1;
   Matrix<float> second = first.inverseMatrix();
-  for(int i = 0; i < first.getRow(); i++) {
-    for(int j = 0; j < first.getColum(); j++) {
+  for (int i = 0; i < first.getRow(); i++) {
+    for (int j = 0; j < first.getColum(); j++) {
       EXPECT_NEAR(second(i, j), result(i, j), EPS);
     }
   }
@@ -710,8 +710,8 @@ TEST(inverseMatrix, example_2) {
   result(2, 0) = 27;
   result(2, 1) = -29;
   result(2, 2) = 24;
-  for(int i = 0; i < first.getRow(); i++) {
-    for(int j = 0; j < first.getColum(); j++) {
+  for (int i = 0; i < first.getRow(); i++) {
+    for (int j = 0; j < first.getColum(); j++) {
       EXPECT_NEAR(second(i, j), result(i, j), EPS);
     }
   }
@@ -799,8 +799,8 @@ TEST(operator_sum, example_1) {
   result(2, 1) = 2 * 2;
   result(2, 2) = 3 * 2;
   Matrix<bool> summa = (first + second);
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       GTEST_ASSERT_EQ(summa(i, j), result(i, j));
     }
   }
@@ -838,8 +838,8 @@ TEST(operator_sum, example_2) {
   result(2, 1) = 0;
   result(2, 2) = 0;
   Matrix summa = first + second;
-  for(int i = 0; i < second.getRow(); i++) {
-    for(int j = 0; j < second.getColum(); j++) {
+  for (int i = 0; i < second.getRow(); i++) {
+    for (int j = 0; j < second.getColum(); j++) {
       GTEST_ASSERT_EQ(summa(i, j), result(i, j));
     }
   }
@@ -877,8 +877,8 @@ TEST(operator_sub, example_1) {
   result(2, 1) = 0;
   result(2, 2) = 0;
   Matrix<short> summa = first - second;
-  for(int i = 0; i < second.getRow(); ++i) {
-    for(int j = 0; j < second.getColum(); ++j) {
+  for (int i = 0; i < second.getRow(); ++i) {
+    for (int j = 0; j < second.getColum(); ++j) {
       GTEST_ASSERT_EQ(summa(i, j), result(i, j));
     }
   }
@@ -903,8 +903,8 @@ TEST(operator_brackets, example_2) {
   result(0, 1) = 2;
   result(1, 0) = 3;
   result(1, 1) = 4;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -923,8 +923,8 @@ TEST(operator_mult_number, example_1) {
   result(1, 1) = 4.;
   float n = 1.0;
   first = first * n;
-  for(int i = 0; i < result.getRow(); ++i) {
-    for(int j = 0; j < result.getColum(); ++j) {
+  for (int i = 0; i < result.getRow(); ++i) {
+    for (int j = 0; j < result.getColum(); ++j) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -943,8 +943,8 @@ TEST(operator_mult_number, example_2) {
   result(1, 1) = 8;
   int n = 2;
   first = first * n;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -963,8 +963,8 @@ TEST(operator_mult_number, example_3) {
   result(1, 1) = 0;
   int n = 0;
   first = first * n;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -983,8 +983,8 @@ TEST(operator_mult_number, example_4) {
   result(1, 1) = 0;
   short n = 0;
   first *= n;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1003,8 +1003,8 @@ TEST(operator_mult_number, friend_1) {
   result(1, 1) = 0;
   double n = 0.0;
   first = n * first;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1022,8 +1022,8 @@ TEST(operator_mult_number, friend_2) {
   result(1, 0) = 0;
   result(1, 1) = 0;
   first = static_cast<float>(0.0) * first;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1041,8 +1041,8 @@ TEST(operator_mult_number_rvalue, example_4) {
   result(1, 0) = 0;
   result(1, 1) = 0;
   first = first * 0.0;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1065,8 +1065,8 @@ TEST(operator_mult_matrix, example_1) {
   result(1, 0) = 7;
   result(1, 1) = 7;
   first = first * second;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1089,8 +1089,8 @@ TEST(operator_sum_eq, example_1) {
   result(1, 0) = 4;
   result(1, 1) = 5;
   first += second;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1113,8 +1113,8 @@ TEST(operator_sub_eq, example_1) {
   result(1, 0) = 0;
   result(1, 1) = 0;
   first -= second;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1133,8 +1133,8 @@ TEST(operator_eq_move, example_1) {
   result(1, 0) = 3;
   result(1, 1) = 4;
   first = std::move(second);
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1152,8 +1152,8 @@ TEST(constructor_move, example_1) {
   result(1, 0) = 3;
   result(1, 1) = 4;
   Matrix<long> first(std::move(second));
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(first(i, j), result(i, j));
     }
   }
@@ -1173,8 +1173,8 @@ TEST(setRow_scale, example_1) {
   result(1, 1) = 4;
   result(2, 0) = 0;
   result(2, 1) = 0;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(second(i, j), result(i, j));
     }
   }
@@ -1194,8 +1194,8 @@ TEST(setRow_scale, example_2) {
   result(0, 1) = 2;
   result(1, 0) = 3;
   result(1, 1) = 4;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(second(i, j), result(i, j));
     }
   }
@@ -1215,8 +1215,8 @@ TEST(setColum_scale, example_1) {
   result(0, 1) = 2;
   result(1, 0) = 3;
   result(1, 1) = 4;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(second(i, j), result(i, j));
     }
   }
@@ -1236,8 +1236,8 @@ TEST(setColum_scale, example_2) {
   result(1, 0) = 3;
   result(1, 1) = 4;
   result(1, 2) = 0;
-  for(int i = 0; i < result.getRow(); i++) {
-    for(int j = 0; j < result.getColum(); j++) {
+  for (int i = 0; i < result.getRow(); i++) {
+    for (int j = 0; j < result.getColum(); j++) {
       GTEST_ASSERT_EQ(second(i, j), result(i, j));
     }
   }
