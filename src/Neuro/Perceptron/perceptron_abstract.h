@@ -20,7 +20,7 @@ class Perceptron {
    * @param path путь к файлу с обучающим материалом
    * @param epochs количество эпох обучения по умолчанию одна
    */
-  virtual void learn(const std::string &path, int8_t epochs = 1) = 0;
+  virtual std::pair<int, std::vector<double>> learn(const std::string &path, int epochs = 1) = 0;
 
   /**
    *

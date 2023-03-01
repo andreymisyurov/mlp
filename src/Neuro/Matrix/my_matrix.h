@@ -1,10 +1,13 @@
 #pragma once
+// прагма
+// функция транспонс
+// неймспейс
 
 #include <cmath>
 #include <exception>
 #include <string>
 
-namespace victoriv {
+//namespace victoriv {
 
 inline constexpr auto EPS = 1e-6;
 
@@ -47,7 +50,32 @@ class Matrix {
   auto mulNumber(T num) -> void;
   auto mulMatrix(const Matrix<T> &other) -> void;
   auto determinant() -> double;
+  virtual auto transpo() -> Matrix<T>*;
   auto transpose() -> Matrix<T>;
+
+
+//  std::shared_ptr<Base> p = std::make_shared<Derived>()
+
+  virtual std::shared_ptr<Matrix<T>> trans() {
+    auto result = std::make_shared<Matrix<T>>(m_column, m_row);
+    for (int i = 0; i < m_row; ++i) {
+      for (int j = 0; j < m_column; ++j) {
+        result->m_matrix[j][i] = m_matrix[i][j];
+      }
+    }
+    return result;
+  }
+//  virtual Matrix<T>* trans() {
+//    auto result = new Matrix<T>(m_column, m_row);
+//    for (int i = 0; i < m_row; ++i) {
+//      for (int j = 0; j < m_column; ++j) {
+//        result->m_matrix[j][i] = m_matrix[i][j];
+//      }
+//    }
+//    return result;
+//  }
+
+
   auto calcComplements() -> Matrix<T>;
   auto inverseMatrix() -> Matrix<T>;
 
@@ -275,6 +303,17 @@ Matrix<T> Matrix<T>::transpose() {
 }
 
 template<typename T>
+auto Matrix<T>::transpo() -> Matrix<T> * {
+  Matrix* result = new Matrix<T>(m_column, m_row);
+  for(int i = 0; i < result->m_row; ++i) {
+    for(int j = 0; j < result->m_column; ++j) {
+      result->m_matrix[i][j] = m_matrix[j][i];
+    }
+  }
+  return result;
+}
+
+template<typename T>
 bool Matrix<T>::operator==(const Matrix<T> &other) const {
   return eqMatrix(other);
 }
@@ -427,4 +466,6 @@ void Matrix<T>::checkConstructor(int value_row, int value_column) {
     throw MyException("Bad value for row or colum.");
 }
 
-}  // namespace victoriv
+
+
+//}  // namespace victoriv

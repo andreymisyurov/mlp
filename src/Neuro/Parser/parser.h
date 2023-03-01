@@ -1,24 +1,28 @@
 #pragma once
-
+// убрать прагму
+// вынести реализацию в source файл
 #include <fstream>
-#include "../Matrix/neuron_matrix.h"
 #include <vector>
 #include <iostream>
-#include "../ThreadPool/thread_pool.h"
 #include <mutex>
 
-using namespace victoriv;
+#include "neuron_matrix.h"
+#include "thread_pool.h"
+
+//using namespace victoriv;
 inline constexpr double kNORMA = 255.;
 
 class Parser {
-  // приватный деструктор чтобы нельзя было создать объект
+  // приватный деструктор чтобы нельзя было создать объект в классе только со стат функциями
   ~Parser() = default;
  public:
   static std::vector<std::pair<int, NeuronMatrix>> getMatrix(const std::string &path, double in_part = 1.0) {
+    // переименовать
+    // бросить крафтовое исключение
     std::vector<std::string> base;
-    std::ifstream input(path);
-    if(!input) throw std::exception();
-    std::string line = "";
+    std::ifstream input(path, std::ios::binary);
+    if(!input) throw MyException("can't open this file");
+    std::string line{};
     while(getline(input, line)) base.push_back(line);
 
     int count_case = static_cast<int>((double)base.size() * in_part);
@@ -38,10 +42,11 @@ class Parser {
   }
 
   static NeuronMatrix parse_one_mtrx(const std::string& in_path) {
+    // временная функция чисто для тестов
     std::ifstream input(in_path);
-    if(!input) throw std::exception();
+    if(!input) throw MyException("can't open this file");
 
-    std::string line = "";
+    std::string line{};
     getline(input, line);
 
     size_t pos = line.find(',');
@@ -59,9 +64,10 @@ class Parser {
   }
 
   static void export_data(std::vector<NeuronMatrix> *weight, const std::string& in_path) {
-    std::fstream input(in_path, std::ios::out);
+    std::ofstream input(in_path, std::ios::binary);
+    if(!input) throw MyException("can't open this file");
     input << std::to_string(weight->size()) << "\n";
-    std::string buffer;
+    std::string buffer{};
     for(auto &&el: *weight) {
       input << std::to_string(el.getRow()) << " " << std::to_string(el.getColum()) << "\n";
       buffer = "";
@@ -74,11 +80,27 @@ class Parser {
       input << buffer;
     }
     input.close();
+//    std::fstream input(in_path, std::ios::out);
+//    input << std::to_string(weight->size()) << "\n";
+//    std::string buffer{};
+//    for(auto &&el: *weight) {
+//      input << std::to_string(el.getRow()) << " " << std::to_string(el.getColum()) << "\n";
+//      buffer = "";
+//      for(int i = 0; i < el.getRow(); ++i) {
+//        for(int j = 0; j < el.getColum(); ++j) {
+//          buffer += std::to_string(el(i, j)) + " ";
+//        }
+//      }
+//      *(--buffer.end()) = '\n';
+//      input << buffer;
+//    }
+//    input.close();
   }
 
   static void import_data(std::vector<NeuronMatrix> *weight, const std::string& in_path) {
     // проверить на утечки
     std::fstream input(in_path);
+    if(!input) throw MyException("can't open this file");
     int loops;
     input >> loops;
     std::vector<NeuronMatrix> *out_weight = new std::vector<NeuronMatrix>;

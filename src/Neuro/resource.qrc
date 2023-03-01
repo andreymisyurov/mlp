@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>best_weights.bin</file>
+        <file>krit.wav</file>
+    </qresource>
+</RCC>

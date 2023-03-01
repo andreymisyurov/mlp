@@ -1,8 +1,9 @@
-#include "../Parser/parser.h"
 #include <optional>
 #include <vector>
-#include "../Perceptron/perceptron_abstract.h"
-#include "./../Timer/timer.h"
+
+#include "parser.h"
+#include "perceptron_abstract.h"
+#include "timer.h"
 
 class PerzeptronMtx: public Perceptron {
  public:
@@ -12,13 +13,13 @@ class PerzeptronMtx: public Perceptron {
 
   void export_data(const std::string &path) override;
   void import_data(const std::string &path) override;
-  void learn(const std::string &path, int8_t epochs = 1) override;
+  std::pair<int, std::vector<double>> learn(const std::string &path, int epochs = 1) override;
   analytical_data test(const std::string &path, double part_of_tests = 1.0) override;
   int predict(const NeuronMatrix &layer_main) override;
 
  private:
-  static int prediction(const NeuronMatrix &layer_main, std::vector<NeuronMatrix> *weights, double in_step, std::optional<int> correct = std::nullopt);
-  static void check_case(int *pass, int correct, NeuronMatrix mtrx, std::vector<NeuronMatrix> *weights, double in_step);
+  static std::pair<int, NeuronMatrix> prediction(const NeuronMatrix &layer_main, std::vector<NeuronMatrix> *weights, double in_step, std::optional<int> correct = std::nullopt);
+  static void check_case(int *pass, int correct, NeuronMatrix mtrx, std::vector<NeuronMatrix> *weights, double in_step, std::vector<int> *analytic, std::mutex *mute);
   void feel_random(NeuronMatrix &mtrx);
 
   std::vector<NeuronMatrix> *weights;
